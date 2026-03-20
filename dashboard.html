@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EspaçoZen — Sistema de Gestão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+<style>
+body { display: flex; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 244px; height: 100vh;
+  background: linear-gradient(175deg, #0a2d5e 0%, #1a4f9c 100%);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  box-shadow: 4px 0 32px rgba(10,45,94,0.18);
+}
+.sidebar-logo {
+  padding: 26px 22px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.logo-mark { display: flex; align-items: center; gap: 10px; }
+.logo-icon {
+  width: 44px; height: 44px; border-radius: 13px;
+  background: var(--amarelo);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(245,200,66,0.4);
+}
+.logo-text { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 18px; color: #fff; line-height: 1.1; }
+.logo-sub  { font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; margin-top: 2px; }
+
+/* Mel 🐕 — a golden retriever mascote */
+.mel-badge {
+  margin: 14px 14px 4px;
+  background: rgba(245,200,66,0.12);
+  border: 1px solid rgba(245,200,66,0.25);
+  border-radius: 13px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 9px;
+  cursor: default; user-select: none;
+}
+.mel-av {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #f5c842, #e09000);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(245,200,66,0.4);
+  position: relative;
+}
+.mel-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #22c55e; border: 2px solid #1a4f9c;
+  position: absolute; bottom: 0; right: 0;
+}
+.mel-name { font-size: 12.5px; font-weight: 800; color: #fde98a; line-height: 1; }
+.mel-desc { font-size: 10.5px; color: rgba(255,255,255,0.45); margin-top: 2px; font-weight: 500; }
+
+.nav { padding: 10px 12px 0; flex: 1; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.nav-label { font-size: 9.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.28); padding: 10px 12px 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 12px;
+  cursor: pointer; transition: all 0.16s;
+  color: rgba(255,255,255,0.62);
+  font-size: 13.5px; font-weight: 600;
+  border: 1.5px solid transparent; user-select: none;
+}
+.nav-item:hover  { background: rgba(255,255,255,0.09); color: #fff; }
+.nav-item.active { background: rgba(245,200,66,0.17); color: #fde98a; border-color: rgba(245,200,66,0.28); }
+.nav-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+.sidebar-footer { padding: 14px 14px 20px; border-top: 1px solid rgba(255,255,255,0.10); }
+.staff-pill {
+  display: flex; align-items: center; gap: 9px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 11px; padding: 9px 12px;
+}
+.staff-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #3b82d8, #1a4f9c);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: #fff; font-weight: 800; flex-shrink: 0;
+}
+.staff-name { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.staff-role { font-size: 10.5px; color: rgba(255,255,255,0.4); font-weight: 500; }
+.logout-btn {
+  margin-left: auto; background: none; border: none;
+  color: rgba(255,255,255,0.4); cursor: pointer;
+  font-size: 18px; transition: color 0.15s; padding: 4px;
+}
+.logout-btn:hover { color: #ef4444; }
+
+/* ── Main ── */
+.main { margin-left: 244px; min-height: 100vh; flex: 1; display: flex; flex-direction: column; }
+.topbar {
+  background: var(--branco); border-bottom: 1px solid var(--borda);
+  padding: 16px 36px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: 0 2px 12px rgba(10,45,94,0.06);
+}
+.topbar-title { font-size: 20px; font-weight: 800; color: var(--azul-escuro); font-family: 'Quicksand', sans-serif; }
+.topbar-sub   { font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
+.content { padding: 32px 36px; flex: 1; }
+
+/* ── Views ── */
+.view        { display: none; }
+.view.active { display: block; }
+
+/* ── Serviços ── */
+.services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; padding: 24px; }
+.service-chip {
+  background: var(--azul-palido); border: 1.5px solid var(--borda);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px; transition: all 0.15s;
+}
+.service-chip:hover { background: var(--azul-suave); border-color: var(--azul-claro); }
+.service-chip-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--azul-suave), var(--azul-claro));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex-shrink: 0;
+}
+.service-chip-name { font-size: 13px; font-weight: 700; color: var(--azul-escuro); }
+</style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-text">EspaçoZen</div>
+        <div class="logo-sub">Sistema de Gestão</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEL 🐕 — Golden Retriever mascote do EspaçoZen -->
+  <div class="mel-badge" title="Mel — Golden Retriever mascote do EspaçoZen 🐾">
+    <div class="mel-av">🐕<span class="mel-dot"></span></div>
+    <div>
+      <div class="mel-name">Mel 🐾</div>
+      <div class="mel-desc">Mascote Golden Retriever</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" data-view="dashboard"><span class="nav-icon">🏠</span> Painel Geral</div>
+    <div class="nav-item" data-view="clientes"><span class="nav-icon">👥</span> Clientes</div>
+    <div class="nav-item" data-view="pagamentos"><span class="nav-icon">💳</span> Pagamentos</div>
+    <div class="nav-label">Referência</div>
+    <div class="nav-item" data-view="servicos"><span class="nav-icon">🩺</span> Serviços</div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="staff-pill">
+      <div class="staff-av" id="staffInitial">?</div>
+      <div>
+        <div class="staff-name" id="staffName">Carregando...</div>
+        <div class="staff-role" id="staffCargo">—</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sair do sistema">⏻</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="topbarTitle">Painel Geral</div>
+      <div class="topbar-sub"   id="topbarSub">Visão geral do EspaçoZen</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-amarelo" onclick="openCadastro()">＋ Novo Cadastro</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid stats-4" id="statsGrid">
+        <div class="stat-card azul"><div class="stat-icon azul">👥</div><div class="stat-number" id="s-total">—</div><div class="stat-label">Total de Clientes</div></div>
+        <div class="stat-card amarelo"><div class="stat-icon amarelo">🧒</div><div class="stat-number" id="s-criancas">—</div><div class="stat-label">Crianças</div></div>
+        <div class="stat-card verde"><div class="stat-icon verde">✅</div><div class="stat-number" id="s-pagos">—</div><div class="stat-label">Pagamentos em Dia</div></div>
+        <div class="stat-card vermelho"><div class="stat-icon vermelho">⚠️</div><div class="stat-number" id="s-pendentes">—</div><div class="stat-label">Pendentes</div></div>
+      </div>
+      <div id="alertaDash" class="alert alert-warning hidden">
+        <span style="font-size:22px">⚠️</span>
+        <div><strong>Pagamentos Pendentes</strong><br><span id="alertaDashTxt"></span></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Últimos Cadastros</div><div class="card-sub">8 clientes mais recentes</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="navTo('clientes')">Ver todos →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Responsável</th><th>Status</th><th>Próx. Vencimento</th></tr></thead>
+            <tbody id="dashTable"><tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CLIENTES ══ -->
+    <div class="view" id="view-clientes">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Todos os Clientes</div><div class="card-sub" id="clientesCount">Carregando...</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div class="search-wrap">
+              <input type="text" class="search-input" id="searchInput" placeholder="Pesquisar aluno..." oninput="onSearch()">
+            </div>
+            <select id="filterTipo" onchange="onSearch()" style="width:auto;padding:8px 12px;font-size:12.5px">
+              <option value="">Todos os tipos</option>
+              <option value="adulto">Adulto</option>
+              <option value="crianca">Criança</option>
+            </select>
+            <select id="filterPago" onchange="onSearch()" style="width:auto;padding:8px 12px;font-size:12.5px">
+              <option value="">Todos os status</option>
+              <option value="1">Pagos</option>
+              <option value="0">Pendentes</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Responsável</th><th>CPF</th><th>Contato</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="clientesTable"></tbody>
+          </table>
+          <div id="emptyClientes" class="empty-state hidden">
+            <div class="empty-icon">🔍</div><h3>Nenhum cliente encontrado</h3><p>Tente ajustar os filtros</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGAMENTOS ══ -->
+    <div class="view" id="view-pagamentos">
+      <div class="stats-grid stats-3" id="statsPag">
+        <div class="stat-card verde"><div class="stat-icon verde">✅</div><div class="stat-number" id="p-pagos">—</div><div class="stat-label">Em Dia</div></div>
+        <div class="stat-card vermelho"><div class="stat-icon vermelho">❌</div><div class="stat-number" id="p-pendentes">—</div><div class="stat-label">Pendentes</div></div>
+        <div class="stat-card azul"><div class="stat-icon azul">👥</div><div class="stat-number" id="p-total">—</div><div class="stat-label">Total Geral</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Controle de Mensalidades</div><div class="card-sub">Renovação automática a cada 31 dias</div></div>
+          <select id="filterPagStatus" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
+            <option value="">Todos</option>
+            <option value="0">Somente Pendentes</option>
+            <option value="1">Somente Pagos</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aluno / Paciente</th><th>Último Pagamento</th><th>Próx. Vencimento</th><th>Status</th><th>Ação</th></tr></thead>
+            <tbody id="pagamentosTable"></tbody>
+          </table>
+          <div id="emptyPag" class="empty-state hidden">
+            <div class="empty-icon">💳</div><h3>Nenhum registro</h3><p>Cadastre clientes para controlar pagamentos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SERVIÇOS ══ -->
+    <div class="view" id="view-servicos">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Serviços Oferecidos</div><div class="card-sub">Todos os serviços disponíveis no EspaçoZen</div></div>
+        </div>
+        <div class="services-grid" id="servicosGrid"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════ MODAL CADASTRO ════ -->
+<div class="modal-overlay" id="modalCadastro">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalCadTitulo">Novo Cadastro</div>
+        <div class="modal-sub">Preencha as informações do cliente</div>
+      </div>
+      <button class="modal-close" onclick="closeCadastro()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">👤 Tipo de Cadastro</div>
+        <div class="type-selector">
+          <div class="type-card" id="typeAdulto" onclick="selectTipo('adulto')">
+            <span class="type-icon">🧑</span>
+            <div class="type-label">Adulto</div>
+            <div class="type-desc">Paciente responsável por si</div>
+          </div>
+          <div class="type-card" id="typeCrianca" onclick="selectTipo('crianca')">
+            <span class="type-icon">🧒</span>
+            <div class="type-label">Criança</div>
+            <div class="type-desc">Paciente menor de idade</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📸 Fotos</div>
+        <div class="form-grid">
+          <div>
+            <label style="margin-bottom:8px">Foto do Responsável</label>
+            <div class="photo-upload-area">
+              <input type="file" id="fotoRespInput" accept="image/jpeg,image/png,image/webp" onchange="previewFoto(this,'prevResp','phResp')">
+              <img id="prevResp" class="photo-preview" alt="">
+              <div id="phResp"><div class="photo-placeholder">📷</div><div class="photo-text">Clique para enviar<br>(JPEG/PNG, máx 5MB)</div></div>
+            </div>
+          </div>
+          <div id="fotoCriancaWrap" style="display:none">
+            <label style="margin-bottom:8px">Foto da Criança</label>
+            <div class="photo-upload-area">
+              <input type="file" id="fotoCriancaInput" accept="image/jpeg,image/png,image/webp" onchange="previewFoto(this,'prevCrianca','phCrianca')">
+              <img id="prevCrianca" class="photo-preview" alt="">
+              <div id="phCrianca"><div class="photo-placeholder">📷</div><div class="photo-text">Clique para enviar<br>(JPEG/PNG, máx 5MB)</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">👤 Dados do Responsável</div>
+        <div class="form-grid">
+          <div class="form-group col-2"><label>Nome Completo *</label><input type="text" id="nomeResp" placeholder="Nome completo do responsável"></div>
+          <div class="form-group"><label>CPF *</label><input type="text" id="cpfResp" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+          <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascResp"></div>
+          <div class="form-group"><label>Telefone *</label><input type="text" id="telResp" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
+          <div class="form-group"><label>E-mail *</label><input type="email" id="emailResp" placeholder="email@exemplo.com"></div>
+        </div>
+      </div>
+
+      <div id="secaoCrianca" style="display:none;margin-bottom:20px">
+        <div class="form-section-title">🧒 Dados da Criança</div>
+        <div class="form-grid">
+          <div class="form-group col-2"><label>Nome Completo da Criança *</label><input type="text" id="nomeCrianca" placeholder="Nome completo da criança"></div>
+          <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascCrianca"></div>
+        </div>
+      </div>
+
+      <div id="formErr" class="alert alert-warning hidden" style="margin-bottom:0"></div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCadastro()">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvar" onclick="salvarCadastro()">💾 Salvar Cadastro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL DETALHE ════ -->
+<div class="modal-overlay" id="modalDetalhe">
+  <div class="modal" style="max-width:660px">
+    <div id="detalheContent"></div>
+  </div>
+</div>
+
+<!-- ════ MODAL HISTÓRICO ════ -->
+<div class="modal-overlay" id="modalHistorico">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div><div class="modal-title">Histórico de Pagamentos</div><div class="modal-sub" id="histSub">—</div></div>
+      <button class="modal-close" onclick="closeHistorico()">✕</button>
+    </div>
+    <div class="modal-body" id="histBody"></div>
+  </div>
+</div>
+
+<!-- ════ MODAL CONFIRM ════ -->
+<div class="modal-overlay" id="modalConfirm">
+  <div class="modal modal-sm">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title" id="confirmTitle">Confirmar</div>
+      <div class="confirm-msg"   id="confirmMsg"></div>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" onclick="closeConfirm()">Cancelar</button>
+        <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="utils.js"></script>
+<script>
+const SERVICES = [
+  {name:'Equoterapia',icon:'🐴'},{name:'Fisioterapia Solo',icon:'🦴'},
+  {name:'Fisioterapia Aquática',icon:'💧'},{name:'Fonoaudióloga',icon:'🗣️'},
+  {name:'Musicoterapia',icon:'🎵'},{name:'Nutricionista',icon:'🥗'},
+  {name:'Psicopedagoga',icon:'📚'},{name:'Psicomotricidade',icon:'🧠'},
+  {name:'Psicóloga',icon:'💬'},{name:'Avaliação Neuropsicologia',icon:'🧬'},
+  {name:'Terapia Alimentar',icon:'🍎'},{name:'AT - Assistente Terapêutica',icon:'🤝'},
+  {name:'TO - Terapeuta Ocupacional',icon:'🖐️'},{name:'Natação Bebê/Infantil/Adulto',icon:'🏊'},
+  {name:'Natação c/ Psicomotricidade',icon:'🌊'},
+];
+
+const TOPBAR = {
+  dashboard:  ['Painel Geral','Visão geral do sistema EspaçoZen'],
+  clientes:   ['Clientes','Gerencie todos os clientes cadastrados'],
+  pagamentos: ['Pagamentos','Controle financeiro — ciclo de 31 dias'],
+  servicos:   ['Serviços','Todos os serviços disponíveis no EspaçoZen'],
+};
+
+let tipoAtual='', clienteEditId=null, searchTimer=null;
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!localStorage.getItem('ez_token')) { window.location.href='/'; return; }
+
+  const user = getUser();
+  if (user) {
+    document.getElementById('staffName').textContent    = user.nome;
+    document.getElementById('staffCargo').textContent   = user.cargo || 'Funcionário';
+    document.getElementById('staffInitial').textContent = user.nome.charAt(0).toUpperCase();
+  }
+
+  document.querySelectorAll('.nav-item[data-view]').forEach(el =>
+    el.addEventListener('click', () => navTo(el.dataset.view))
+  );
+
+  setupModalClose('modalCadastro',  closeCadastro);
+  setupModalClose('modalDetalhe',   closeDetalhe);
+  setupModalClose('modalHistorico', closeHistorico);
+  setupModalClose('modalConfirm',   closeConfirm);
+
+  renderServicos();
+  await carregarDashboard();
+});
+
+/* ── NAVEGAÇÃO ── */
+function navTo(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelector(`.nav-item[data-view="${view}"]`)?.classList.add('active');
+  document.getElementById('topbarTitle').textContent = TOPBAR[view][0];
+  document.getElementById('topbarSub').textContent   = TOPBAR[view][1];
+  if (view==='dashboard')  carregarDashboard();
+  if (view==='clientes')   carregarClientes();
+  if (view==='pagamentos') carregarPagamentos();
+}
+
+/* ── DASHBOARD ── */
+async function carregarDashboard() {
+  const data = await apiStats();
+  if (!data?.ok) { toast('Erro ao carregar painel.','error'); return; }
+  const {stats,recentes} = data;
+
+  document.getElementById('s-total').textContent     = stats.total;
+  document.getElementById('s-criancas').textContent  = stats.criancas;
+  document.getElementById('s-pagos').textContent     = stats.pagos;
+  document.getElementById('s-pendentes').textContent = stats.pendentes;
+
+  const alertEl = document.getElementById('alertaDash');
+  if (stats.pendentes > 0) {
+    alertEl.classList.remove('hidden');
+    document.getElementById('alertaDashTxt').textContent =
+      `${stats.pendentes} cliente(s) com pagamento pendente. Acesse Pagamentos para regularizar.`;
+  } else {
+    alertEl.classList.add('hidden');
+  }
+
+  const tbody = document.getElementById('dashTable');
+  if (!recentes.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🌱</div><h3>Nenhum cliente ainda</h3><p>Clique em "Novo Cadastro" para começar</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recentes.map(c => {
+    const nome  = c.tipo==='crianca' ? c.nomeCrianca : c.nomeResponsavel;
+    const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
+    const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
+    return `<tr>
+      <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
+        <div class="name-main">${nome}</div>
+        <div class="name-sub">cadastrado em ${fmtData(c.criadoEm)}</div>
+      </div></div></td>
+      <td><span class="badge badge-${c.tipo}">${c.tipo==='crianca'?'🧒 Criança':'🧑 Adulto'}</span></td>
+      <td><span style="font-weight:700">${c.nomeResponsavel}</span></td>
+      <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
+      <td><span class="badge badge-vence">📅 ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── CLIENTES ── */
+async function carregarClientes(params={}) {
+  const tbody=document.getElementById('clientesTable');
+  const empty=document.getElementById('emptyClientes');
+  tbody.innerHTML=`<tr class="loading-row"><td colspan="7"><div class="spinner"></div></td></tr>`;
+  empty.classList.add('hidden');
+
+  const data = await apiListarClientes(params);
+  if (!data?.ok) { toast('Erro ao carregar clientes.','error'); return; }
+
+  document.getElementById('clientesCount').textContent = `${data.total} cliente(s) cadastrado(s)`;
+
+  if (!data.clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+
+  tbody.innerHTML = data.clientes.map(c => {
+    const nome  = c.tipo==='crianca' ? c.nomeCrianca : c.nomeResponsavel;
+    const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
+    const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
+    const nomeEsc = (nome||'').replace(/'/g,"\\'");
+    return `<tr>
+      <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
+        <div class="name-main">${nome}</div>
+        <div class="name-sub">desde ${fmtData(c.criadoEm)}</div>
+      </div></div></td>
+      <td><span class="badge badge-${c.tipo}">${c.tipo==='crianca'?'🧒 Criança':'🧑 Adulto'}</span></td>
+      <td><span style="font-weight:600">${c.nomeResponsavel}</span></td>
+      <td><span style="font-size:12.5px;color:#64748b">${c.cpf}</span></td>
+      <td><span style="font-size:12.5px;font-weight:600">${c.telefone}</span></td>
+      <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
+      <td><div class="actions">
+        <button class="btn btn-ghost btn-xs" onclick="verDetalhe('${c.id}')">👁 Ver</button>
+        <button class="btn btn-ghost btn-xs" onclick="openEditar('${c.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmarDelete('${c.id}','${nomeEsc}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function onSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    const params={};
+    const q=document.getElementById('searchInput').value;
+    const t=document.getElementById('filterTipo').value;
+    const p=document.getElementById('filterPago').value;
+    if(q) params.q=q; if(t) params.tipo=t; if(p!=='') params.pago=p;
+    carregarClientes(params);
+  }, 350);
+}
+
+/* ── PAGAMENTOS ── */
+async function carregarPagamentos() {
+  const pago=document.getElementById('filterPagStatus').value;
+  const params={}; if(pago!=='') params.pago=pago;
+  const data = await apiListarClientes(params);
+  if (!data?.ok) return;
+
+  document.getElementById('p-pagos').textContent    = data.clientes.filter(c=>c.pago).length;
+  document.getElementById('p-pendentes').textContent= data.clientes.filter(c=>!c.pago).length;
+  document.getElementById('p-total').textContent    = data.total;
+
+  const tbody=document.getElementById('pagamentosTable');
+  const empty=document.getElementById('emptyPag');
+
+  if (!data.clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = data.clientes.map(c => {
+    const nome  = c.tipo==='crianca' ? c.nomeCrianca : c.nomeResponsavel;
+    const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
+    const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
+    const nomeEsc = (nome||'').replace(/'/g,"\\'");
+    const btn = c.pago
+      ? `<button class="btn btn-success btn-xs" disabled>✓ Em dia</button>
+         <button class="btn btn-ghost btn-xs" onclick="verHistorico('${c.id}','${nomeEsc}')">📋</button>`
+      : `<button class="btn btn-amarelo btn-sm" onclick="registrarPag('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`;
+    return `<tr>
+      <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
+        <div class="name-main">${nome}</div>
+        <div class="name-sub">${c.nomeResponsavel}</div>
+      </div></div></td>
+      <td>${c.dataPagamento ? fmtData(c.dataPagamento) : '<span class="text-muted">—</span>'}</td>
+      <td><span class="badge badge-vence">📅 ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</span></td>
+      <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
+      <td><div class="actions">${btn}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function registrarPag(id, nome) {
+  const data = await apiMarcarPago(id);
+  if (!data?.ok) { toast(data?.message||'Erro ao registrar pagamento.','error'); return; }
+  toast(`Pagamento de "${nome}" registrado! Próx. vencimento: ${fmtData(data.proximoVencimento)}`,'success');
+  carregarPagamentos();
+  carregarDashboard();
+}
+
+async function verHistorico(id, nome) {
+  document.getElementById('histSub').textContent = nome;
+  document.getElementById('histBody').innerHTML  = `<div style="text-align:center;padding:24px"><div class="spinner"></div></div>`;
+  document.getElementById('modalHistorico').classList.add('open');
+  const data = await apiHistoricoPagamentos(id);
+  if (!data?.ok || !data.historico.length) {
+    document.getElementById('histBody').innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon">📋</div><h3>Sem histórico</h3><p>Nenhum pagamento registrado ainda</p></div>`;
+    return;
+  }
+  document.getElementById('histBody').innerHTML = data.historico.map(h => `
+    <div class="hist-item">
+      <div><div style="font-weight:700;color:var(--azul-escuro)">💰 ${fmtData(h.data_pagamento)}</div>
+      <div class="text-muted">Por: ${h.funcionario_nome||'Sistema'}</div></div>
+      <div style="text-align:right"><div class="text-muted">Vencimento:</div>
+      <div style="font-weight:700;color:var(--azul-medio)">${fmtData(h.vencimento)}</div></div>
+    </div>`).join('');
+}
+function closeHistorico() { document.getElementById('modalHistorico').classList.remove('open'); }
+
+/* ── SERVIÇOS ── */
+function renderServicos() {
+  document.getElementById('servicosGrid').innerHTML = SERVICES.map(s =>
+    `<div class="service-chip"><div class="service-chip-icon">${s.icon}</div><div class="service-chip-name">${s.name}</div></div>`
+  ).join('');
+}
+
+/* ── CADASTRO ── */
+function openCadastro() {
+  clienteEditId=null; tipoAtual='';
+  resetForm();
+  document.getElementById('modalCadTitulo').textContent = 'Novo Cadastro';
+  document.getElementById('btnSalvar').textContent = '💾 Salvar Cadastro';
+  document.getElementById('modalCadastro').classList.add('open');
+}
+
+async function openEditar(id) {
+  const data = await apiObterCliente(id);
+  if (!data?.ok) { toast('Erro ao carregar dados.','error'); return; }
+  const c=data.cliente; clienteEditId=id;
+  resetForm(); selectTipo(c.tipo);
+  document.getElementById('nomeResp').value       = c.nomeResponsavel||'';
+  document.getElementById('cpfResp').value        = c.cpf||'';
+  document.getElementById('dataNascResp').value   = (c.dataNascResp||'').slice(0,10);
+  document.getElementById('telResp').value        = c.telefone||'';
+  document.getElementById('emailResp').value      = c.email||'';
+  if (c.tipo==='crianca') {
+    document.getElementById('nomeCrianca').value     = c.nomeCrianca||'';
+    document.getElementById('dataNascCrianca').value = (c.dataNascCrianca||'').slice(0,10);
+  }
+  if (c.fotoResponsavel) { const i=document.getElementById('prevResp'); i.src=c.fotoResponsavel; i.style.display='block'; document.getElementById('phResp').style.display='none'; }
+  if (c.fotoCrianca)    { const i=document.getElementById('prevCrianca'); i.src=c.fotoCrianca; i.style.display='block'; document.getElementById('phCrianca').style.display='none'; }
+  document.getElementById('modalCadTitulo').textContent = 'Editar Cadastro';
+  document.getElementById('btnSalvar').textContent = '💾 Atualizar';
+  document.getElementById('modalCadastro').classList.add('open');
+}
+
+function closeCadastro() { document.getElementById('modalCadastro').classList.remove('open'); clienteEditId=null; }
+
+function resetForm() {
+  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['prevResp','prevCrianca'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.src='';}});
+  ['phResp','phCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='block';});
+  ['fotoRespInput','fotoCriancaInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('typeAdulto').classList.remove('selected');
+  document.getElementById('typeCrianca').classList.remove('selected');
+  document.getElementById('secaoCrianca').style.display='none';
+  document.getElementById('fotoCriancaWrap').style.display='none';
+  document.getElementById('formErr').classList.add('hidden');
+}
+
+function selectTipo(tipo) {
+  tipoAtual=tipo;
+  document.getElementById('typeAdulto').classList.toggle('selected',tipo==='adulto');
+  document.getElementById('typeCrianca').classList.toggle('selected',tipo==='crianca');
+  document.getElementById('secaoCrianca').style.display   =tipo==='crianca'?'block':'none';
+  document.getElementById('fotoCriancaWrap').style.display=tipo==='crianca'?'block':'none';
+}
+
+async function salvarCadastro() {
+  const errEl=document.getElementById('formErr');
+  errEl.classList.add('hidden');
+
+  if (!tipoAtual) { errEl.textContent='⚠️ Selecione Adulto ou Criança.'; errEl.classList.remove('hidden'); return; }
+
+  const nomeResp    =document.getElementById('nomeResp').value.trim();
+  const cpf         =document.getElementById('cpfResp').value.trim();
+  const dataNascResp=document.getElementById('dataNascResp').value;
+  const tel         =document.getElementById('telResp').value.trim();
+  const email       =document.getElementById('emailResp').value.trim();
+
+  if (!nomeResp||!cpf||!dataNascResp||!tel||!email) {
+    errEl.textContent='⚠️ Preencha todos os campos obrigatórios do responsável.';
+    errEl.classList.remove('hidden'); return;
+  }
+
+  let nomeCrianca='', dataNascCrianca='';
+  if (tipoAtual==='crianca') {
+    nomeCrianca    =document.getElementById('nomeCrianca').value.trim();
+    dataNascCrianca=document.getElementById('dataNascCrianca').value;
+    if (!nomeCrianca||!dataNascCrianca) {
+      errEl.textContent='⚠️ Preencha os dados da criança.';
+      errEl.classList.remove('hidden'); return;
+    }
+  }
+
+  const btn=document.getElementById('btnSalvar');
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  const fd=new FormData();
+  fd.append('tipo',tipoAtual);
+  fd.append('nomeResponsavel',nomeResp);
+  fd.append('cpf',cpf);
+  fd.append('dataNascResp',dataNascResp);
+  fd.append('telefone',tel);
+  fd.append('email',email);
+  if (tipoAtual==='crianca') { fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca); }
+  const fR=document.getElementById('fotoRespInput').files[0];
+  const fC=document.getElementById('fotoCriancaInput').files[0];
+  if(fR) fd.append('fotoResponsavel',fR);
+  if(fC) fd.append('fotoCrianca',fC);
+
+  try {
+    const data = clienteEditId
+      ? await apiAtualizarCliente(clienteEditId,fd)
+      : await apiCriarCliente(fd);
+
+    if (!data?.ok) { errEl.textContent=`⚠️ ${data?.message||'Erro ao salvar.'}`; errEl.classList.remove('hidden'); return; }
+
+    closeCadastro();
+    const principal = tipoAtual==='crianca' ? nomeCrianca : nomeResp;
+    toast(`"${principal}" ${clienteEditId?'atualizado':'cadastrado'} com sucesso! 🎉`,'success');
+    carregarDashboard();
+    if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
+  } catch { errEl.textContent='⚠️ Erro de conexão com o servidor.'; errEl.classList.remove('hidden'); }
+  finally { btn.disabled=false; btn.textContent=clienteEditId?'💾 Atualizar':'💾 Salvar Cadastro'; }
+}
+
+/* ── DETALHE ── */
+async function verDetalhe(id) {
+  document.getElementById('detalheContent').innerHTML=`<div style="padding:60px;text-align:center"><div class="spinner"></div></div>`;
+  document.getElementById('modalDetalhe').classList.add('open');
+  const data=await apiObterCliente(id);
+  if (!data?.ok) { toast('Erro ao carregar detalhes.','error'); closeDetalhe(); return; }
+  const c=data.cliente;
+  const nome  =c.tipo==='crianca'?c.nomeCrianca:c.nomeResponsavel;
+  const foto  =c.tipo==='crianca'?c.fotoCrianca:c.fotoResponsavel;
+  const emoji =c.tipo==='crianca'?'🧒':'🧑';
+  const nomeEsc=(nome||'').replace(/'/g,"\\'");
+  const avHtml=foto?`<img src="${foto}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${emoji}'">`:`${emoji}`;
+  const rAv=c.fotoResponsavel?`<img src="${c.fotoResponsavel}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.3)">`:'<span style="font-size:18px">👤</span>';
+
+  document.getElementById('detalheContent').innerHTML=`
+    <div class="detail-hero">
+      <div class="detail-avatar">${avHtml}</div>
+      <div style="flex:1;min-width:0">
+        <div class="detail-name">${nome}</div>
+        <div class="detail-type">${c.tipo==='crianca'?'Paciente — Criança':'Paciente — Adulto'} · Cadastrado em ${fmtData(c.criadoEm)}</div>
+        <div style="margin-top:10px"><span class="badge badge-${c.pago?'pago':'pendente'}" style="font-size:12px">${c.pago?'✓ Pagamento em dia':'✗ Pagamento pendente'}</span></div>
+      </div>
+      <button class="modal-close" style="background:rgba(255,255,255,0.1);color:#fff;flex-shrink:0" onclick="closeDetalhe()">✕</button>
+    </div>
+    <div class="payment-block">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8">Status do Pagamento</div>
+        <div style="font-size:17px;font-weight:900;color:${c.pago?'#16a34a':'#dc2626'};margin-top:3px">${c.pago?'Em Dia ✓':'Pendente ✗'}</div>
+        <div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:4px">Último pag.: ${c.dataPagamento?fmtDataHora(c.dataPagamento):'Nunca'} · Próx.: ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${!c.pago?`<button class="btn btn-amarelo btn-sm" onclick="registrarPagDetalhe('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();verHistorico('${c.id}','${nomeEsc}')">📋 Histórico</button>
+      </div>
+    </div>
+    <div class="detail-grid">
+      ${c.tipo==='crianca'?`
+        <div style="grid-column:span 2"><div class="detail-label">Nome da Criança</div><div class="detail-value">${c.nomeCrianca}</div></div>
+        <div><div class="detail-label">Nascimento (Criança)</div><div class="detail-value">${fmtData(c.dataNascCrianca)} · ${calcIdade(c.dataNascCrianca)}</div></div>
+        <div><div class="detail-label">Foto da Criança</div><div>${c.fotoCrianca?`<img src="${c.fotoCrianca}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`:'—'}</div></div>
+      `:''}
+      <div style="grid-column:span 2">
+        <div class="detail-label">Responsável</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:5px">
+          <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--azul-suave);display:flex;align-items:center;justify-content:center;border:2px solid var(--borda);flex-shrink:0">${rAv}</div>
+          <div class="detail-value">${c.nomeResponsavel}</div>
+        </div>
+      </div>
+      <div><div class="detail-label">CPF</div><div class="detail-value">${c.cpf}</div></div>
+      <div><div class="detail-label">Nascimento (Resp.)</div><div class="detail-value">${fmtData(c.dataNascResp)} · ${calcIdade(c.dataNascResp)}</div></div>
+      <div><div class="detail-label">Telefone</div><div class="detail-value">${c.telefone}</div></div>
+      <div><div class="detail-label">E-mail</div><div class="detail-value">${c.email}</div></div>
+    </div>
+    <div style="padding:0 32px 28px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="closeDetalhe()">Fechar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();openEditar('${c.id}')">✏️ Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="closeDetalhe();confirmarDelete('${c.id}','${nomeEsc}')">🗑️ Apagar</button>
+    </div>`;
+}
+
+async function registrarPagDetalhe(id, nome) {
+  const data=await apiMarcarPago(id);
+  if (!data?.ok) { toast(data?.message||'Erro.','error'); return; }
+  toast(`Pagamento de "${nome}" registrado! Próx.: ${fmtData(data.proximoVencimento)}`,'success');
+  closeDetalhe(); carregarDashboard();
+}
+
+function closeDetalhe() { document.getElementById('modalDetalhe').classList.remove('open'); }
+
+/* ── DELETE ── */
+function confirmarDelete(id, nome) {
+  confirmar('Apagar Cliente?',
+    `"${nome}" e todos os seus dados serão removidos permanentemente. Esta ação não pode ser desfeita.`,
+    async () => {
+      const data=await apiRemoverCliente(id);
+      if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
+      toast(`"${nome}" removido do sistema.`,'warning');
+      carregarDashboard();
+      if (document.getElementById('view-clientes').classList.contains('active'))   carregarClientes();
+      if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
+    }
+  );
+}
+</script>
+</body>
+</html>
