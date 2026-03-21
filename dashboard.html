@@ -133,9 +133,8 @@ body { display: flex; }
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-mark">
-      <div class="logo-icon">
-        <!-- Coloque o arquivo logo.png na pasta espacozen-frontend -->
-        <img src="logo.png" alt="EspaçoZen" style="width:38px;height:38px;object-fit:contain">
+      <div class="logo-icon" style="padding:0;overflow:hidden;background:none;box-shadow:none;">
+        <img src="logo.png" alt="EspaçoZen" style="width:100%;height:100%;object-fit:cover;border-radius:13px">
       </div>
       <div>
         <div class="logo-text">EspaçoZen</div>
@@ -148,7 +147,8 @@ body { display: flex; }
   <div class="mel-badge" title="Mel — Golden Retriever mascote do EspaçoZen 🐾">
     <div class="mel-av">🐕<span class="mel-dot"></span></div>
     <div>
-      <div class="mel-desc">A Mel está feliz em te ver.</div>
+      <div class="mel-name">Mel 🐾</div>
+      <div class="mel-desc">Mascote Golden Retriever</div>
     </div>
   </div>
 
@@ -355,6 +355,11 @@ body { display: flex; }
         </div>
       </div>
 
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">🩺 Serviços</div>
+        <div id="servicosCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+      </div>
+
       <div id="formErr" class="alert alert-warning hidden" style="margin-bottom:0"></div>
 
       <div class="modal-footer">
@@ -424,6 +429,29 @@ const TOPBAR = {
 
 let tipoAtual='', clienteEditId=null, searchTimer=null;
 
+/* ── CHECKBOXES SERVIÇOS ── */
+function renderCheckboxesServicos() {
+  const container = document.getElementById('servicosCheckboxes');
+  if (!container) return;
+  container.innerHTML = SERVICES.map(s => `
+    <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--borda);border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--azul-escuro);background:var(--cinza-suave);transition:all 0.15s" 
+           onmouseover="this.style.background='var(--azul-suave)'" onmouseout="this.style.background='var(--cinza-suave)'">
+      <input type="checkbox" class="servico-check" value="${s.name}" style="width:auto;accent-color:var(--azul-medio)">
+      <span>${s.icon} ${s.name}</span>
+    </label>
+  `).join('');
+}
+
+function getServicosSelected() {
+  return Array.from(document.querySelectorAll('.servico-check:checked')).map(cb => cb.value);
+}
+
+function setServicosSelected(servicos) {
+  document.querySelectorAll('.servico-check').forEach(cb => {
+    cb.checked = servicos.includes(cb.value);
+  });
+}
+
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', async () => {
   if (!localStorage.getItem('ez_token')) { window.location.href='/'; return; }
@@ -445,6 +473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalClose('modalConfirm',   closeConfirm);
 
   renderServicos();
+  renderCheckboxesServicos();
   await carregarDashboard();
 });
 
@@ -650,6 +679,7 @@ async function openEditar(id) {
     document.getElementById('dataNascCrianca').value = (c.dataNascCrianca||'').slice(0,10);
   }
   if (c.fotoResponsavel) { const i=document.getElementById('prevResp'); i.src=c.fotoResponsavel; i.style.display='block'; document.getElementById('phResp').style.display='none'; }
+  if (c.servicos) setServicosSelected(c.servicos);
   if (c.fotoCrianca)    { const i=document.getElementById('prevCrianca'); i.src=c.fotoCrianca; i.style.display='block'; document.getElementById('phCrianca').style.display='none'; }
   document.getElementById('modalCadTitulo').textContent = 'Editar Cadastro';
   document.getElementById('btnSalvar').textContent = '💾 Atualizar';
@@ -668,6 +698,7 @@ function resetForm() {
   document.getElementById('secaoCrianca').style.display='none';
   document.getElementById('fotoCriancaWrap').style.display='none';
   document.getElementById('formErr').classList.add('hidden');
+  document.querySelectorAll('.servico-check').forEach(cb => cb.checked = false);
 }
 
 function selectTipo(tipo) {
@@ -720,6 +751,7 @@ async function salvarCadastro() {
   const fC=document.getElementById('fotoCriancaInput').files[0];
   if(fR) fd.append('fotoResponsavel',fR);
   if(fC) fd.append('fotoCrianca',fC);
+  fd.append('servicos', JSON.stringify(getServicosSelected()));
 
   try {
     const data = clienteEditId
