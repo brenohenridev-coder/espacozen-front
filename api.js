@@ -17,6 +17,11 @@ async function apiFetch(path, options = {}) {
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (res.status === 401) { logout(); return null; }
+  if (res.status === 402) {
+    const data = await res.json();
+    if (data.bloqueado) mostrarBloqueio(data.linkPagamento);
+    return data;
+  }
   return res.json();
 }
 
@@ -37,3 +42,55 @@ async function apiAtualizarCliente(id, fd)  { return apiFetch(`/clientes/${id}`,
 async function apiRemoverCliente(id)        { return apiFetch(`/clientes/${id}`, { method: 'DELETE' }); }
 async function apiMarcarPago(id)            { return apiFetch(`/clientes/${id}/pagamento`, { method: 'PATCH' }); }
 async function apiHistoricoPagamentos(id)   { return apiFetch(`/clientes/${id}/historico-pagamentos`); }
+
+// Assinatura do sistema
+async function apiStatusAssinatura() {
+  return fetch(`${API_BASE}/assinatura/status`).then(r => r.json());
+}
+
+// Bloqueio do sistema — overlay
+let _bloqueioAtivo = false;
+function mostrarBloqueio(linkPagamento) {
+  if (_bloqueioAtivo) return;
+  _bloqueioAtivo = true;
+
+  let overlay = document.getElementById('overlay-bloqueio');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'overlay-bloqueio';
+    overlay.innerHTML = `
+      <div class="bloqueio-card">
+        <div class="bloqueio-icon">🔒</div>
+        <h2>Sistema Bloqueado</h2>
+        <p>A mensalidade do sistema está pendente.<br>Efetue o pagamento para liberar o acesso.</p>
+        <a id="btn-pagar-assinatura" href="#" target="_blank" class="bloqueio-btn">Pagar Agora</a>
+        <p class="bloqueio-sub">Após o pagamento, o sistema será liberado automaticamente.</p>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  const btn = document.getElementById('btn-pagar-assinatura');
+  if (linkPagamento) {
+    btn.href = linkPagamento;
+    btn.style.display = '';
+  } else {
+    btn.style.display = 'none';
+  }
+
+  overlay.classList.add('visivel');
+
+  // Polling: verifica a cada 30s se o pagamento foi feito
+  clearInterval(window._bloqueioPolling);
+  window._bloqueioPolling = setInterval(async () => {
+    try {
+      const res = await apiStatusAssinatura();
+      if (res.ok && res.ativa) {
+        overlay.classList.remove('visivel');
+        _bloqueioAtivo = false;
+        clearInterval(window._bloqueioPolling);
+        window.location.reload();
+      }
+    } catch {}
+  }, 30000);
+}

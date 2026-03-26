@@ -487,6 +487,12 @@ function setServicosSelected(servicos) {
 document.addEventListener('DOMContentLoaded', async () => {
   if (!localStorage.getItem('ez_token')) { window.location.href='/'; return; }
 
+  // Verificar assinatura do sistema
+  try {
+    const ass = await apiStatusAssinatura();
+    if (ass.ok && !ass.ativa) mostrarBloqueio(ass.linkPagamento);
+  } catch {}
+
   const user = getUser();
   if (user) {
     document.getElementById('staffName').textContent    = user.nome;

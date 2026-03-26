@@ -357,3 +357,69 @@ label { font-size: 12px; font-weight: 700; color: var(--azul-escuro); display: b
   .col-2 { grid-column: span 1; }
   .stats-3, .stats-4 { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── Overlay Bloqueio Sistema ── */
+#overlay-bloqueio {
+  position: fixed; inset: 0;
+  background: rgba(10, 45, 94, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: none;
+  align-items: center; justify-content: center;
+}
+#overlay-bloqueio.visivel {
+  display: flex;
+}
+.bloqueio-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: bloqueioIn 0.4s ease;
+}
+@keyframes bloqueioIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.bloqueio-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+.bloqueio-card h2 {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--azul-escuro);
+  margin-bottom: 12px;
+}
+.bloqueio-card p {
+  color: var(--cinza-texto);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.bloqueio-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+}
+.bloqueio-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(34,197,94,0.5);
+}
+.bloqueio-sub {
+  font-size: 12.5px !important;
+  color: #94a3b8 !important;
+  margin-top: 8px;
+  margin-bottom: 0 !important;
+}
