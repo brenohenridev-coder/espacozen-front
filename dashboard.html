@@ -275,7 +275,7 @@ body { display: flex; }
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Aluno / Paciente</th><th>Último Pagamento</th><th>Próx. Vencimento</th><th>Status</th><th>Ação</th></tr></thead>
+            <thead><tr><th>Aluno / Paciente</th><th>Último Pagamento</th><th>Próx. Vencimento</th><th>Plano</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody id="pagamentosTable"></tbody>
           </table>
           <div id="emptyPag" class="empty-state hidden">
@@ -542,6 +542,32 @@ body { display: flex; }
           <div><div style="font-weight:800;color:var(--azul-escuro)">Plano de Saúde</div><div style="font-size:11.5px;color:#94a3b8">Convênio médico</div></div>
         </label>
       </div>
+
+      <div class="form-section-title">📋 Plano</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <label id="optMensal" onclick="selecionarPlano('Mensal')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
+          <span style="font-size:20px">📅</span>
+          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Mensal</div><div style="font-size:10.5px;color:#94a3b8">31 dias</div></div>
+        </label>
+        <label id="optTrimestral" onclick="selecionarPlano('Trimestral')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
+          <span style="font-size:20px">📆</span>
+          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Trimestral</div><div style="font-size:10.5px;color:#94a3b8">93 dias</div></div>
+        </label>
+        <label id="optSemestral" onclick="selecionarPlano('Semestral')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
+          <span style="font-size:20px">🗓️</span>
+          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Semestral</div><div style="font-size:10.5px;color:#94a3b8">186 dias</div></div>
+        </label>
+        <label id="opt4Meses" onclick="selecionarPlano('4 Meses')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
+          <span style="font-size:20px">📑</span>
+          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">4 Meses</div><div style="font-size:10.5px;color:#94a3b8">124 dias</div></div>
+        </label>
+      </div>
+
+      <div id="campoPlanoSaude" style="display:none;margin-bottom:16px">
+        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro);margin-bottom:6px;display:block">🏥 Nome do Plano de Saúde</label>
+        <input type="text" id="inputNomePlanoSaude" placeholder="Ex: Unimed, Amil, SulAmérica..." style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
+      </div>
+
       <div class="modal-footer" style="padding-top:0;border:none">
         <button class="btn btn-ghost" onclick="closePagamento()">Cancelar</button>
         <button class="btn btn-amarelo" id="btnConfirmarPag" disabled onclick="confirmarPagamento()">✓ Confirmar Pagamento</button>
@@ -784,22 +810,29 @@ async function carregarPagamentos() {
       </div></div></td>
       <td>${c.dataPagamento ? fmtData(c.dataPagamento) : '<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-vence">📅 ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</span></td>
+      <td>${c.plano?`<span class="badge badge-neutro">${c.plano}</span>`:'<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
       <td><div class="actions">${btn}</div></td>
     </tr>`;
   }).join('');
 }
 
-let _pagId = null, _pagNome = null, _pagForma = null, _pagContext = null;
+let _pagId = null, _pagNome = null, _pagForma = null, _pagPlano = null, _pagContext = null;
 
 function openPagamento(id, nome, context='pagamentos') {
-  _pagId = id; _pagNome = nome; _pagForma = null; _pagContext = context;
+  _pagId = id; _pagNome = nome; _pagForma = null; _pagPlano = null; _pagContext = context;
   document.getElementById('pagNomeSub').textContent = nome;
   document.getElementById('btnConfirmarPag').disabled = true;
   ['optDinheiro','optPix','optCartao','optPlanoSaude'].forEach(id => {
     document.getElementById(id).style.border = '2px solid var(--borda)';
     document.getElementById(id).style.background = 'var(--cinza-suave)';
   });
+  ['optMensal','optTrimestral','optSemestral','opt4Meses'].forEach(id => {
+    document.getElementById(id).style.border = '2px solid var(--borda)';
+    document.getElementById(id).style.background = 'var(--cinza-suave)';
+  });
+  document.getElementById('campoPlanoSaude').style.display = 'none';
+  document.getElementById('inputNomePlanoSaude').value = '';
   document.getElementById('modalPagamento').classList.add('open');
 }
 
@@ -812,7 +845,24 @@ function selecionarForma(forma) {
   });
   const el = document.getElementById(map[forma]);
   if (el) { el.style.border = '2px solid var(--azul-medio)'; el.style.background = 'var(--azul-suave)'; }
-  document.getElementById('btnConfirmarPag').disabled = false;
+  document.getElementById('campoPlanoSaude').style.display = forma === 'Plano de Saúde' ? 'block' : 'none';
+  checkPagBtn();
+}
+
+function selecionarPlano(plano) {
+  _pagPlano = plano;
+  const map = { 'Mensal': 'optMensal', 'Trimestral': 'optTrimestral', 'Semestral': 'optSemestral', '4 Meses': 'opt4Meses' };
+  ['optMensal','optTrimestral','optSemestral','opt4Meses'].forEach(id => {
+    document.getElementById(id).style.border = '2px solid var(--borda)';
+    document.getElementById(id).style.background = 'var(--cinza-suave)';
+  });
+  const el = document.getElementById(map[plano]);
+  if (el) { el.style.border = '2px solid var(--azul-medio)'; el.style.background = 'var(--azul-suave)'; }
+  checkPagBtn();
+}
+
+function checkPagBtn() {
+  document.getElementById('btnConfirmarPag').disabled = !(_pagForma && _pagPlano);
 }
 
 function closePagamento() {
@@ -821,16 +871,17 @@ function closePagamento() {
 }
 
 async function confirmarPagamento() {
-  if (!_pagId || !_pagForma) return;
+  if (!_pagId || !_pagForma || !_pagPlano) return;
+  const nomePlanoSaude = _pagForma === 'Plano de Saúde' ? (document.getElementById('inputNomePlanoSaude').value.trim() || null) : null;
   const data = await apiFetch(`/clientes/${_pagId}/pagamento`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ formaPagamento: _pagForma })
+    body: JSON.stringify({ formaPagamento: _pagForma, plano: _pagPlano, nomePlanoSaude })
   });
   if (!data?.ok) { toast(data?.message||'Erro ao registrar pagamento.','error'); return; }
   closePagamento();
   const icones = { 'Dinheiro': '💵', 'Pix': '📱', 'Cartão': '💳', 'Plano de Saúde': '🏥' };
-  toast(`Pagamento de "${_pagNome}" registrado! ${icones[_pagForma]||''} ${_pagForma} · Próx.: ${fmtData(data.proximoVencimento)}`,'success');
+  toast(`Pagamento de "${_pagNome}" registrado! ${icones[_pagForma]||''} ${_pagForma} · ${_pagPlano} · Próx.: ${fmtData(data.proximoVencimento)}`,'success');
   if (_pagContext === 'detalhe') { closeDetalhe(); }
   carregarDashboard();
   if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
@@ -854,7 +905,8 @@ async function verHistorico(id, nome) {
     <div class="hist-item">
       <div><div style="font-weight:700;color:var(--azul-escuro)">💰 ${fmtData(h.data_pagamento)}</div>
       <div class="text-muted">Por: ${h.funcionario_nome||'Sistema'}</div>
-      ${h.forma_pagamento ? `<span class="badge badge-neutro" style="margin-top:4px">${iconesPag[h.forma_pagamento]||'💳'} ${h.forma_pagamento}</span>` : ''}</div>
+      ${h.forma_pagamento ? `<span class="badge badge-neutro" style="margin-top:4px">${iconesPag[h.forma_pagamento]||'💳'} ${h.forma_pagamento}</span>` : ''}
+      ${h.plano ? `<span class="badge badge-neutro" style="margin-top:4px">📋 ${h.plano}</span>` : ''}</div>
       <div style="text-align:right"><div class="text-muted">Vencimento:</div>
       <div style="font-weight:700;color:var(--azul-medio)">${fmtData(h.vencimento)}</div></div>
     </div>`).join('');
@@ -1010,7 +1062,8 @@ async function verDetalhe(id) {
       <div>
         <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8">Status do Pagamento</div>
         <div style="font-size:17px;font-weight:900;color:${c.pago?'#16a34a':'#dc2626'};margin-top:3px">${c.pago?'Em Dia ✓':'Pendente ✗'}</div>
-        <div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:4px">Último pag.: ${c.dataPagamento?fmtDataHora(c.dataPagamento):'Nunca'} · Próx.: ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</div>
+        <div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:4px">Último pag.: ${c.dataPagamento?fmtDataHora(c.dataPagamento):'Nunca'} · Próx.: ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}${c.plano?` · Plano: ${c.plano}`:''}</div>
+        ${c.nomePlanoSaude?`<div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:2px">🏥 Plano de Saúde: ${c.nomePlanoSaude}</div>`:''}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${!c.pago?`<button class="btn btn-amarelo btn-sm" onclick="registrarPagDetalhe('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`:''}
