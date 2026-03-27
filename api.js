@@ -42,6 +42,25 @@ async function apiAtualizarCliente(id, fd)  { return apiFetch(`/clientes/${id}`,
 async function apiRemoverCliente(id)        { return apiFetch(`/clientes/${id}`, { method: 'DELETE' }); }
 async function apiMarcarPago(id)            { return apiFetch(`/clientes/${id}/pagamento`, { method: 'PATCH' }); }
 async function apiHistoricoPagamentos(id)   { return apiFetch(`/clientes/${id}/historico-pagamentos`); }
+async function apiAniversariantes()        { return apiFetch('/clientes/aniversariantes'); }
+
+// Funcionarios
+async function apiAlterarSenha(senhaAtual, novaSenha) {
+  return apiFetch('/auth/senha', { method: 'PUT', body: JSON.stringify({ senhaAtual, novaSenha }) });
+}
+async function apiUploadFoto(fd) { return apiFetch('/auth/foto', { method: 'PUT', body: fd }); }
+async function apiListarFuncionarios() { return apiFetch('/auth/funcionarios'); }
+async function apiCriarFuncionario(dados) {
+  return apiFetch('/auth/funcionarios', { method: 'POST', body: JSON.stringify(dados) });
+}
+
+// Observacoes
+async function apiListarObservacoes()   { return apiFetch('/observacoes'); }
+async function apiCriarObservacao(texto) { return apiFetch('/observacoes', { method: 'POST', body: JSON.stringify({ texto }) }); }
+async function apiRemoverObservacao(id) { return apiFetch(`/observacoes/${id}`, { method: 'DELETE' }); }
+
+// Logs
+async function apiListarLogs() { return apiFetch('/logs'); }
 
 // Assinatura do sistema
 async function apiStatusAssinatura() {
