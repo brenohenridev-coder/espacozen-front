@@ -266,12 +266,21 @@ body { display: flex; }
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">Controle de Mensalidades</div><div class="card-sub">Renovação automática a cada 31 dias</div></div>
-          <select id="filterPagStatus" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
-            <option value="">Todos</option>
-            <option value="0">Somente Pendentes</option>
-            <option value="1">Somente Pagos</option>
-          </select>
+          <div><div class="card-title">Controle de Mensalidades</div><div class="card-sub">Renovação automática conforme plano</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <div class="search-wrap">
+              <input type="text" class="search-input" id="searchPag" placeholder="Pesquisar aluno..." oninput="onSearchPag()">
+            </div>
+            <select id="filterPagStatus" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
+              <option value="">Todos</option>
+              <option value="0">Somente Pendentes</option>
+              <option value="1">Somente Pagos</option>
+            </select>
+            <select id="filterPagOrdem" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
+              <option value="alfa">A → Z</option>
+              <option value="">Mais recentes</option>
+            </select>
+          </div>
         </div>
         <div class="table-wrap">
           <table>
@@ -483,6 +492,11 @@ body { display: flex; }
       <div style="margin-bottom:20px">
         <div class="form-section-title">🩺 Serviços</div>
         <div id="servicosCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📝 Observação Inicial (opcional)</div>
+        <textarea id="obsCadastro" rows="3" placeholder="Anotação sobre o cliente (visível no perfil)..." style="resize:vertical"></textarea>
       </div>
 
       <div id="formErr" class="alert alert-warning hidden" style="margin-bottom:0"></div>
@@ -824,9 +838,18 @@ function onSearch() {
 }
 
 /* ── PAGAMENTOS ── */
+let searchPagTimer = null;
+function onSearchPag() {
+  clearTimeout(searchPagTimer);
+  searchPagTimer = setTimeout(() => carregarPagamentos(), 350);
+}
+
 async function carregarPagamentos() {
   const pago=document.getElementById('filterPagStatus').value;
-  const params={}; if(pago!=='') params.pago=pago;
+  const q=document.getElementById('searchPag')?.value||'';
+  const ordem=document.getElementById('filterPagOrdem')?.value||'';
+  const params={}; if(pago!=='') params.pago=pago; if(q) params.q=q; if(ordem) params.ordem=ordem;
+  params.limit = 500;
   const data = await apiListarClientes(params);
   if (!data?.ok) return;
 
@@ -858,7 +881,9 @@ async function carregarPagamentos() {
       <td><span class="badge badge-vence">📅 ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</span></td>
       <td>${c.plano?`<span class="badge badge-neutro">${c.plano}</span>`:'<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
-      <td><div class="actions">${btn}</div></td>
+      <td><div class="actions">${btn}
+        <button class="btn btn-ghost btn-xs" onclick="abrirEditarDatas('${c.id}','${c.dataPagamento?(c.dataPagamento).slice(0,10):''}','${c.proximoVencimento?(c.proximoVencimento).slice(0,10):''}')" title="Editar datas">📅</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -1006,7 +1031,7 @@ async function openEditar(id) {
 function closeCadastro() { document.getElementById('modalCadastro').classList.remove('open'); clienteEditId=null; }
 
 function resetForm() {
-  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio','obsCadastro'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['prevResp','prevCrianca'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.src='';}});
   ['phResp','phCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='block';});
   ['fotoRespInput','fotoCriancaInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1087,6 +1112,15 @@ async function salvarCadastro() {
 
     if (!data?.ok) { errEl.textContent=`⚠️ ${data?.message||'Erro ao salvar.'}`; errEl.classList.remove('hidden'); return; }
 
+    // Enviar observação inicial se preenchida (só no cadastro novo)
+    const obsTxt = document.getElementById('obsCadastro').value.trim();
+    if (obsTxt && !clienteEditId && data.cliente?.id) {
+      await apiFetch(`/clientes/${data.cliente.id}/observacoes`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: obsTxt })
+      });
+    }
+
     closeCadastro();
     const principal = tipoAtual==='crianca' ? nomeCrianca : nomeResp;
     toast(`"${principal}" ${clienteEditId?'atualizado':'cadastrado'} com sucesso! 🎉`,'success');
@@ -1164,6 +1198,14 @@ async function verDetalhe(id) {
       <div style="display:flex;flex-wrap:wrap;gap:6px">${c.servicos.map(s=>`<span class="badge badge-neutro" style="font-size:11.5px">${s}</span>`).join('')}</div>
     </div>`:''}
     <div style="padding:0 32px 20px">
+      <div class="detail-label" style="margin-bottom:8px">Observações do Cliente</div>
+      <div id="detalheObsCliente" style="margin-bottom:10px"><div class="spinner" style="width:20px;height:20px"></div></div>
+      <div style="display:flex;gap:8px;align-items:end">
+        <textarea id="novaObsCliente" rows="2" placeholder="Escrever observação..." style="flex:1;resize:vertical;font-size:13px;padding:10px 12px;border:1.5px solid var(--borda);border-radius:8px;font-family:inherit"></textarea>
+        <button class="btn btn-primary btn-xs" onclick="salvarObsCliente('${c.id}')" style="white-space:nowrap">📝 Salvar</button>
+      </div>
+    </div>
+    <div style="padding:0 32px 20px">
       <div class="detail-label" style="margin-bottom:8px">Documentos</div>
       <div id="detalheDocumentos" style="margin-bottom:10px"><div class="spinner" style="width:20px;height:20px"></div></div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -1181,7 +1223,8 @@ async function verDetalhe(id) {
       <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();openEditar('${c.id}')">✏️ Editar</button>
       <button class="btn btn-danger btn-sm" onclick="closeDetalhe();confirmarDelete('${c.id}','${nomeEsc}')">🗑️ Apagar</button>
     </div>`;
-  // Carregar documentos
+  // Carregar observações e documentos
+  carregarObsCliente(id);
   carregarDocumentosDetalhe(id);
 }
 
@@ -1417,6 +1460,53 @@ async function salvarEditarDatas() {
   carregarDashboard();
   if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
   if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
+}
+
+/* ── OBSERVAÇÕES DO CLIENTE ── */
+async function carregarObsCliente(clienteId) {
+  const el = document.getElementById('detalheObsCliente');
+  if (!el) return;
+  const data = await apiFetch(`/clientes/${clienteId}/observacoes`);
+  if (!data?.ok || !data.observacoes.length) {
+    el.innerHTML = '<span style="font-size:12px;color:#94a3b8">Nenhuma observação.</span>';
+    return;
+  }
+  const user = getUser();
+  el.innerHTML = data.observacoes.map(o => {
+    const canDel = o.funcionario_id === user?.id || user?.cargo === 'Administrador';
+    return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5fb">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--azul-escuro)">${o.funcionario_nome||'Sistema'}</span>
+          <span style="font-size:10.5px;color:#94a3b8">${fmtDataHora(o.criado_em)}</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--cinza-texto);line-height:1.5;white-space:pre-wrap;margin-top:3px">${o.texto}</div>
+      </div>
+      ${canDel ? `<button class="btn btn-danger btn-xs" onclick="removerObsCliente('${clienteId}','${o.id}')" style="align-self:start;flex-shrink:0">🗑</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function salvarObsCliente(clienteId) {
+  const txt = document.getElementById('novaObsCliente').value.trim();
+  if (!txt) { toast('Digite uma observação.','warning'); return; }
+  const data = await apiFetch(`/clientes/${clienteId}/observacoes`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texto: txt })
+  });
+  if (!data?.ok) { toast(data?.message||'Erro ao salvar.','error'); return; }
+  document.getElementById('novaObsCliente').value = '';
+  toast('Observação salva!','success');
+  carregarObsCliente(clienteId);
+}
+
+async function removerObsCliente(clienteId, obsId) {
+  confirmar('Remover Observação?', 'Esta observação será excluída.', async () => {
+    const data = await apiFetch(`/clientes/${clienteId}/observacoes/${obsId}`, { method: 'DELETE' });
+    if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
+    toast('Observação removida.','warning');
+    carregarObsCliente(clienteId);
+  });
 }
 
 /* ── DOCUMENTOS ── */
