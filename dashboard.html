@@ -595,6 +595,30 @@ body { display: flex; }
   </div>
 </div>
 
+<!-- ════ MODAL EDITAR DATAS ════ -->
+<div class="modal-overlay" id="modalEditarDatas">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div><div class="modal-title">Editar Datas de Pagamento</div><div class="modal-sub">Altere as datas manualmente</div></div>
+      <button class="modal-close" onclick="fecharEditarDatas()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro)">📅 Data do Pagamento</label>
+        <input type="date" id="editDataPagamento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit">
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro)">📅 Próximo Vencimento</label>
+        <input type="date" id="editProxVencimento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit">
+      </div>
+      <div class="modal-footer" style="padding-top:16px;border:none">
+        <button class="btn btn-ghost" onclick="fecharEditarDatas()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEditarDatas()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toasts"></div>
 
 <script src="config.js"></script>
@@ -1109,6 +1133,7 @@ async function verDetalhe(id) {
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${!c.pago?`<button class="btn btn-amarelo btn-sm" onclick="registrarPagDetalhe('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();verHistorico('${c.id}','${nomeEsc}')">📋 Histórico</button>
+        <button class="btn btn-ghost btn-sm" onclick="abrirEditarDatas('${c.id}','${c.dataPagamento?c.dataPagamento.slice(0,10):''}','${c.proximoVencimento?c.proximoVencimento.slice(0,10):''}')">📅 Editar Datas</button>
       </div>
     </div>
     <div class="detail-grid">
@@ -1260,6 +1285,7 @@ async function carregarAtividades() {
     'INATIVAR_CLIENTE': '⛔ Inativou cliente',
     'UPLOAD_DOC': '📎 Enviou documento',
     'REMOVER_DOC': '🗑️ Removeu documento',
+    'EDITAR_DATAS_PAG': '📅 Editou datas de pagamento',
   };
 
   tbody.innerHTML = data.logs.map(l => {
@@ -1356,6 +1382,41 @@ async function criarFuncionario() {
   document.getElementById('novoFuncSenha').value = '';
   document.getElementById('novoFuncCargo').value = 'Funcionário';
   carregarUsuarios();
+}
+
+/* ── EDITAR DATAS PAGAMENTO ── */
+let _editDatasId = null;
+
+function abrirEditarDatas(id, dataPag, proxVenc) {
+  _editDatasId = id;
+  document.getElementById('editDataPagamento').value = dataPag || '';
+  document.getElementById('editProxVencimento').value = proxVenc || '';
+  document.getElementById('modalEditarDatas').classList.add('open');
+  setupModalClose('modalEditarDatas', fecharEditarDatas);
+}
+
+function fecharEditarDatas() {
+  document.getElementById('modalEditarDatas').classList.remove('open');
+  _editDatasId = null;
+}
+
+async function salvarEditarDatas() {
+  if (!_editDatasId) return;
+  const dataPagamento = document.getElementById('editDataPagamento').value || null;
+  const proximoVencimento = document.getElementById('editProxVencimento').value || null;
+  if (!dataPagamento && !proximoVencimento) { toast('Preencha ao menos uma data.','warning'); return; }
+  const data = await apiFetch(`/clientes/${_editDatasId}/datas-pagamento`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dataPagamento, proximoVencimento })
+  });
+  if (!data?.ok) { toast(data?.message||'Erro ao salvar datas.','error'); return; }
+  toast('Datas atualizadas!','success');
+  fecharEditarDatas();
+  closeDetalhe();
+  carregarDashboard();
+  if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
+  if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
 }
 
 /* ── DOCUMENTOS ── */
