@@ -276,6 +276,13 @@ body { display: flex; }
               <option value="0">Somente Pendentes</option>
               <option value="1">Somente Pagos</option>
             </select>
+            <select id="filterPagPlano" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
+              <option value="">Todos os Planos</option>
+              <option value="Mensal">Mensal</option>
+              <option value="Trimestral">Trimestral</option>
+              <option value="Semestral">Semestral</option>
+              <option value="4 Meses">4 Meses</option>
+            </select>
             <select id="filterPagOrdem" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
               <option value="alfa">A → Z</option>
               <option value="">Mais recentes</option>
@@ -848,22 +855,26 @@ async function carregarPagamentos() {
   const pago=document.getElementById('filterPagStatus').value;
   const q=document.getElementById('searchPag')?.value||'';
   const ordem=document.getElementById('filterPagOrdem')?.value||'';
+  const planoFiltro=document.getElementById('filterPagPlano')?.value||'';
   const params={}; if(pago!=='') params.pago=pago; if(q) params.q=q; if(ordem) params.ordem=ordem;
   params.limit = 500;
   const data = await apiListarClientes(params);
   if (!data?.ok) return;
 
-  document.getElementById('p-pagos').textContent    = data.clientes.filter(c=>c.pago).length;
-  document.getElementById('p-pendentes').textContent= data.clientes.filter(c=>!c.pago).length;
-  document.getElementById('p-total').textContent    = data.total;
+  let clientes = data.clientes;
+  if (planoFiltro) clientes = clientes.filter(c => c.plano === planoFiltro);
+
+  document.getElementById('p-pagos').textContent    = clientes.filter(c=>c.pago).length;
+  document.getElementById('p-pendentes').textContent= clientes.filter(c=>!c.pago).length;
+  document.getElementById('p-total').textContent    = clientes.length;
 
   const tbody=document.getElementById('pagamentosTable');
   const empty=document.getElementById('emptyPag');
 
-  if (!data.clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  if (!clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
 
-  tbody.innerHTML = data.clientes.map(c => {
+  tbody.innerHTML = clientes.map(c => {
     const nome  = c.tipo==='crianca' ? c.nomeCrianca : c.nomeResponsavel;
     const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
     const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
