@@ -62,6 +62,14 @@ async function apiRemoverObservacao(id) { return apiFetch(`/observacoes/${id}`, 
 // Logs
 async function apiListarLogs() { return apiFetch('/logs'); }
 
+// Documentos
+async function apiListarDocumentos(clienteId) { return apiFetch(`/clientes/${clienteId}/documentos`); }
+async function apiUploadDocumento(clienteId, fd) { return apiFetch(`/clientes/${clienteId}/documentos`, { method: 'POST', body: fd }); }
+async function apiRemoverDocumento(clienteId, docId) { return apiFetch(`/clientes/${clienteId}/documentos/${docId}`, { method: 'DELETE' }); }
+
+// Toggle ativo
+async function apiToggleAtivo(clienteId) { return apiFetch(`/clientes/${clienteId}/ativo`, { method: 'PATCH' }); }
+
 // Assinatura do sistema
 async function apiStatusAssinatura() {
   return fetch(`${API_BASE}/assinatura/status`).then(r => r.json());

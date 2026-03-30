@@ -247,10 +247,10 @@ body { display: flex; }
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Responsável</th><th>CPF</th><th>Contato</th><th>Status</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Atividade</th><th>Ativo</th><th>Status Pag.</th><th>Ações</th></tr></thead>
             <tbody id="clientesTable"></tbody>
           </table>
-          <div id="emptyClientes" class="empty-state hidden">
+          <div id="emptyClientes" class="empty-state hidden" style="grid-column:span 6">
             <div class="empty-icon">🔍</div><h3>Nenhum cliente encontrado</h3><p>Tente ajustar os filtros</p>
           </div>
         </div>
@@ -464,6 +464,19 @@ body { display: flex; }
         <div class="form-grid">
           <div class="form-group col-2"><label>Nome Completo da Criança *</label><input type="text" id="nomeCrianca" placeholder="Nome completo da criança"></div>
           <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascCrianca"></div>
+          <div class="form-group"><label>CPF da Criança (opcional)</label><input type="text" id="cpfCrianca" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+        </div>
+        <div class="form-section-title" style="margin-top:16px">👥 2° Responsável (opcional)</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nome do 2° Responsável</label><input type="text" id="nomeResp2" placeholder="Nome completo"></div>
+          <div class="form-group"><label>Telefone do 2° Responsável</label><input type="text" id="telResp2" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📅 Data de Início</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Data que o cliente iniciou</label><input type="date" id="dataInicio"></div>
         </div>
       </div>
 
@@ -568,6 +581,12 @@ body { display: flex; }
         <input type="text" id="inputNomePlanoSaude" placeholder="Ex: Unimed, Amil, SulAmérica..." style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
       </div>
 
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro);margin-bottom:6px;display:block">📅 Data de Vencimento (opcional)</label>
+        <input type="date" id="inputDataVencimento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px">Deixe vazio para calcular automaticamente pelo plano. Use para clientes antigos com data fixa.</div>
+      </div>
+
       <div class="modal-footer" style="padding-top:0;border:none">
         <button class="btn btn-ghost" onclick="closePagamento()">Cancelar</button>
         <button class="btn btn-amarelo" id="btnConfirmarPag" disabled onclick="confirmarPagamento()">✓ Confirmar Pagamento</button>
@@ -589,8 +608,10 @@ const SERVICES = [
   {name:'Psicopedagoga',icon:'📚'},{name:'Psicomotricidade',icon:'🧠'},
   {name:'Psicóloga',icon:'💬'},{name:'Avaliação Neuropsicologia',icon:'🧬'},
   {name:'Terapia Alimentar',icon:'🍎'},{name:'AT - Assistente Terapêutica',icon:'🤝'},
-  {name:'TO - Terapeuta Ocupacional',icon:'🖐️'},{name:'Natação Bebê/Infantil/Adulto',icon:'🏊'},
-  {name:'Natação c/ Psicomotricidade',icon:'🌊'},
+  {name:'TO - Terapeuta Ocupacional',icon:'🖐️'},
+  {name:'Natação Bebê',icon:'🏊'},{name:'Natação Infantil',icon:'🏊'},{name:'Natação Adulto',icon:'🏊'},
+  {name:'Natação c/ Psicomotricidade',icon:'🌊'},{name:'Natação com Personal',icon:'🏊‍♂️'},
+  {name:'Pilates',icon:'🧘'},{name:'Hidroterapia em Grupo',icon:'💧'},
 ];
 
 const TOPBAR = {
@@ -746,15 +767,16 @@ async function carregarClientes(params={}) {
     const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
     const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
     const nomeEsc = (nome||'').replace(/'/g,"\\'");
-    return `<tr>
+    const atividades = (c.servicos||[]).join(', ') || '—';
+    const ativoLabel = c.ativo ? '<span class="badge badge-pago">Ativo</span>' : '<span class="badge badge-pendente">Inativo</span>';
+    return `<tr style="${!c.ativo?'opacity:0.6':''}">
       <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
         <div class="name-main">${nome}</div>
-        <div class="name-sub">desde ${fmtData(c.criadoEm)}</div>
+        <div class="name-sub">${c.nomeResponsavel}${c.tipo==='crianca'?' (resp.)':''} · ${c.telefone}</div>
       </div></div></td>
       <td><span class="badge badge-${c.tipo}">${c.tipo==='crianca'?'🧒 Criança':'🧑 Adulto'}</span></td>
-      <td><span style="font-weight:600">${c.nomeResponsavel}</span></td>
-      <td><span style="font-size:12.5px;color:#64748b">${c.cpf}</span></td>
-      <td><span style="font-size:12.5px;font-weight:600">${c.telefone}</span></td>
+      <td style="font-size:11.5px;color:#64748b;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${atividades}">${atividades}</td>
+      <td><span style="cursor:pointer" onclick="toggleAtivo('${c.id}')" title="Clique para alternar">${ativoLabel}</span></td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
       <td><div class="actions">
         <button class="btn btn-ghost btn-xs" onclick="verDetalhe('${c.id}')">👁 Ver</button>
@@ -833,6 +855,7 @@ function openPagamento(id, nome, context='pagamentos') {
   });
   document.getElementById('campoPlanoSaude').style.display = 'none';
   document.getElementById('inputNomePlanoSaude').value = '';
+  document.getElementById('inputDataVencimento').value = '';
   document.getElementById('modalPagamento').classList.add('open');
 }
 
@@ -873,10 +896,11 @@ function closePagamento() {
 async function confirmarPagamento() {
   if (!_pagId || !_pagForma || !_pagPlano) return;
   const nomePlanoSaude = _pagForma === 'Plano de Saúde' ? (document.getElementById('inputNomePlanoSaude').value.trim() || null) : null;
+  const dataVencimento = document.getElementById('inputDataVencimento').value || null;
   const data = await apiFetch(`/clientes/${_pagId}/pagamento`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ formaPagamento: _pagForma, plano: _pagPlano, nomePlanoSaude })
+    body: JSON.stringify({ formaPagamento: _pagForma, plano: _pagPlano, nomePlanoSaude, dataVencimento })
   });
   if (!data?.ok) { toast(data?.message||'Erro ao registrar pagamento.','error'); return; }
   closePagamento();
@@ -942,7 +966,11 @@ async function openEditar(id) {
   if (c.tipo==='crianca') {
     document.getElementById('nomeCrianca').value     = c.nomeCrianca||'';
     document.getElementById('dataNascCrianca').value = (c.dataNascCrianca||'').slice(0,10);
+    document.getElementById('cpfCrianca').value      = c.cpfCrianca||'';
+    document.getElementById('nomeResp2').value       = c.nomeResponsavel2||'';
+    document.getElementById('telResp2').value        = c.telefoneResponsavel2||'';
   }
+  if (c.dataInicio) document.getElementById('dataInicio').value = (c.dataInicio||'').slice(0,10);
   if (c.fotoResponsavel) { const i=document.getElementById('prevResp'); i.src=c.fotoResponsavel; i.style.display='block'; document.getElementById('phResp').style.display='none'; }
   if (c.servicos) setServicosSelected(c.servicos);
   if (c.fotoCrianca)    { const i=document.getElementById('prevCrianca'); i.src=c.fotoCrianca; i.style.display='block'; document.getElementById('phCrianca').style.display='none'; }
@@ -954,7 +982,7 @@ async function openEditar(id) {
 function closeCadastro() { document.getElementById('modalCadastro').classList.remove('open'); clienteEditId=null; }
 
 function resetForm() {
-  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['prevResp','prevCrianca'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.src='';}});
   ['phResp','phCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='block';});
   ['fotoRespInput','fotoCriancaInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1011,7 +1039,17 @@ async function salvarCadastro() {
   fd.append('dataNascResp',dataNascResp);
   fd.append('telefone',tel);
   fd.append('email',email);
-  if (tipoAtual==='crianca') { fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca); }
+  if (tipoAtual==='crianca') {
+    fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca);
+    const cpfC = document.getElementById('cpfCrianca').value.trim();
+    const nomeR2 = document.getElementById('nomeResp2').value.trim();
+    const telR2 = document.getElementById('telResp2').value.trim();
+    if (cpfC) fd.append('cpfCrianca', cpfC);
+    if (nomeR2) fd.append('nomeResponsavel2', nomeR2);
+    if (telR2) fd.append('telefoneResponsavel2', telR2);
+  }
+  const dataIni = document.getElementById('dataInicio').value;
+  if (dataIni) fd.append('dataInicio', dataIni);
   const fR=document.getElementById('fotoRespInput').files[0];
   const fC=document.getElementById('fotoCriancaInput').files[0];
   if(fR) fd.append('fotoResponsavel',fR);
@@ -1054,7 +1092,10 @@ async function verDetalhe(id) {
       <div style="flex:1;min-width:0">
         <div class="detail-name">${nome}</div>
         <div class="detail-type">${c.tipo==='crianca'?'Paciente — Criança':'Paciente — Adulto'} · Cadastrado em ${fmtData(c.criadoEm)}</div>
-        <div style="margin-top:10px"><span class="badge badge-${c.pago?'pago':'pendente'}" style="font-size:12px">${c.pago?'✓ Pagamento em dia':'✗ Pagamento pendente'}</span></div>
+        <div style="margin-top:10px">
+        <span class="badge badge-${c.pago?'pago':'pendente'}" style="font-size:12px">${c.pago?'✓ Pagamento em dia':'✗ Pagamento pendente'}</span>
+        <span class="badge" style="font-size:12px;margin-left:6px;background:${c.ativo?'#dcfce7;color:#16a34a':'#fee2e2;color:#dc2626'}">${c.ativo?'Ativo':'Inativo'}</span>
+      </div>
       </div>
       <button class="modal-close" style="background:rgba(255,255,255,0.1);color:#fff;flex-shrink:0" onclick="closeDetalhe()">✕</button>
     </div>
@@ -1074,7 +1115,10 @@ async function verDetalhe(id) {
       ${c.tipo==='crianca'?`
         <div style="grid-column:span 2"><div class="detail-label">Nome da Criança</div><div class="detail-value">${c.nomeCrianca}</div></div>
         <div><div class="detail-label">Nascimento (Criança)</div><div class="detail-value">${fmtData(c.dataNascCrianca)} · ${calcIdade(c.dataNascCrianca)}</div></div>
+        <div><div class="detail-label">CPF da Criança</div><div class="detail-value">${c.cpfCrianca||'Não informado'}</div></div>
         <div><div class="detail-label">Foto da Criança</div><div>${c.fotoCrianca?`<img src="${c.fotoCrianca}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`:'—'}</div></div>
+        ${c.nomeResponsavel2?`<div><div class="detail-label">2° Responsável</div><div class="detail-value">${c.nomeResponsavel2}</div></div>
+        <div><div class="detail-label">Tel. 2° Responsável</div><div class="detail-value">${c.telefoneResponsavel2||'—'}</div></div>`:''}
       `:''}
       <div style="grid-column:span 2">
         <div class="detail-label">Responsável</div>
@@ -1087,12 +1131,33 @@ async function verDetalhe(id) {
       <div><div class="detail-label">Nascimento (Resp.)</div><div class="detail-value">${fmtData(c.dataNascResp)} · ${calcIdade(c.dataNascResp)}</div></div>
       <div><div class="detail-label">Telefone</div><div class="detail-value">${c.telefone}</div></div>
       <div><div class="detail-label">E-mail</div><div class="detail-value">${c.email}</div></div>
+      <div><div class="detail-label">Data de Início</div><div class="detail-value">${c.dataInicio?fmtData(c.dataInicio):'Não informado'}</div></div>
+    </div>
+    ${(c.servicos&&c.servicos.length)?`
+    <div style="padding:0 32px 16px">
+      <div class="detail-label" style="margin-bottom:8px">Atividades / Serviços</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${c.servicos.map(s=>`<span class="badge badge-neutro" style="font-size:11.5px">${s}</span>`).join('')}</div>
+    </div>`:''}
+    <div style="padding:0 32px 20px">
+      <div class="detail-label" style="margin-bottom:8px">Documentos</div>
+      <div id="detalheDocumentos" style="margin-bottom:10px"><div class="spinner" style="width:20px;height:20px"></div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="tipoDocUpload" style="padding:6px 10px;font-size:12px;border:1.5px solid var(--borda);border-radius:8px;font-family:inherit">
+          <option value="Atestado">Atestado</option><option value="Encaminhamento">Encaminhamento</option><option value="Laudo">Laudo</option><option value="Receita">Receita</option><option value="Outro">Outro</option>
+        </select>
+        <label class="btn btn-ghost btn-xs" style="cursor:pointer;position:relative;overflow:hidden">
+          📎 Enviar Documento
+          <input type="file" id="docUploadInput" accept="image/*,.pdf" onchange="uploadDocumento('${c.id}')" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+        </label>
+      </div>
     </div>
     <div style="padding:0 32px 28px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="closeDetalhe()">Fechar</button>
       <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();openEditar('${c.id}')">✏️ Editar</button>
       <button class="btn btn-danger btn-sm" onclick="closeDetalhe();confirmarDelete('${c.id}','${nomeEsc}')">🗑️ Apagar</button>
     </div>`;
+  // Carregar documentos
+  carregarDocumentosDetalhe(id);
 }
 
 async function registrarPagDetalhe(id, nome) {
@@ -1191,6 +1256,10 @@ async function carregarAtividades() {
     'APAGAR_CLIENTE': '🗑️ Apagou cliente',
     'MARCAR_PAGO': '💰 Marcou como pago',
     'CRIAR_FUNCIONARIO': '👤 Criou usuário',
+    'ATIVAR_CLIENTE': '✅ Ativou cliente',
+    'INATIVAR_CLIENTE': '⛔ Inativou cliente',
+    'UPLOAD_DOC': '📎 Enviou documento',
+    'REMOVER_DOC': '🗑️ Removeu documento',
   };
 
   tbody.innerHTML = data.logs.map(l => {
@@ -1287,6 +1356,60 @@ async function criarFuncionario() {
   document.getElementById('novoFuncSenha').value = '';
   document.getElementById('novoFuncCargo').value = 'Funcionário';
   carregarUsuarios();
+}
+
+/* ── DOCUMENTOS ── */
+async function carregarDocumentosDetalhe(clienteId) {
+  const el = document.getElementById('detalheDocumentos');
+  if (!el) return;
+  const data = await apiFetch(`/clientes/${clienteId}/documentos`);
+  if (!data?.ok || !data.documentos.length) {
+    el.innerHTML = '<span style="font-size:12px;color:#94a3b8">Nenhum documento enviado.</span>';
+    return;
+  }
+  el.innerHTML = data.documentos.map(d => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5fb">
+      <span style="font-size:18px">${d.tipo==='Atestado'?'📄':d.tipo==='Encaminhamento'?'📋':d.tipo==='Laudo'?'📑':d.tipo==='Receita'?'💊':'📎'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:700;color:var(--azul-escuro)">${d.tipo} — ${d.nome_arquivo}</div>
+        <div style="font-size:11px;color:#94a3b8">Por ${d.enviado_por_nome||'Sistema'} em ${fmtData(d.criado_em)}</div>
+      </div>
+      <a href="${d.url}" target="_blank" class="btn btn-ghost btn-xs" title="Abrir">👁</a>
+      <button class="btn btn-danger btn-xs" onclick="removerDocumento('${clienteId}','${d.id}')" title="Remover">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function uploadDocumento(clienteId) {
+  const file = document.getElementById('docUploadInput').files[0];
+  if (!file) return;
+  const tipo = document.getElementById('tipoDocUpload').value;
+  const fd = new FormData();
+  fd.append('documento', file);
+  fd.append('tipoDocumento', tipo);
+  const data = await apiFetch(`/clientes/${clienteId}/documentos`, { method: 'POST', body: fd });
+  if (!data?.ok) { toast(data?.message||'Erro ao enviar documento.','error'); return; }
+  toast('Documento enviado!','success');
+  document.getElementById('docUploadInput').value = '';
+  carregarDocumentosDetalhe(clienteId);
+}
+
+async function removerDocumento(clienteId, docId) {
+  confirmar('Remover Documento?', 'O documento será excluído permanentemente.', async () => {
+    const data = await apiFetch(`/clientes/${clienteId}/documentos/${docId}`, { method: 'DELETE' });
+    if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
+    toast('Documento removido.','warning');
+    carregarDocumentosDetalhe(clienteId);
+  });
+}
+
+/* ── TOGGLE ATIVO ── */
+async function toggleAtivo(id) {
+  const data = await apiFetch(`/clientes/${id}/ativo`, { method: 'PATCH' });
+  if (!data?.ok) { toast(data?.message||'Erro ao alterar status.','error'); return; }
+  toast(data.message, data.ativo ? 'success' : 'warning');
+  if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
+  if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
 }
 
 /* ── DELETE ── */
