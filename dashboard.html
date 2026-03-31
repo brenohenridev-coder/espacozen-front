@@ -472,6 +472,7 @@ body { display: flex; }
           <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascResp"></div>
           <div class="form-group"><label>Telefone *</label><input type="text" id="telResp" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
           <div class="form-group"><label>E-mail *</label><input type="email" id="emailResp" placeholder="email@exemplo.com"></div>
+          <div class="form-group col-2"><label>Endereço</label><input type="text" id="enderecoResp" placeholder="Rua, número, bairro, cidade - UF"></div>
         </div>
       </div>
 
@@ -1030,6 +1031,7 @@ async function openEditar(id) {
     document.getElementById('nomeResp2').value       = c.nomeResponsavel2||'';
     document.getElementById('telResp2').value        = c.telefoneResponsavel2||'';
   }
+  document.getElementById('enderecoResp').value = c.endereco||'';
   if (c.dataInicio) document.getElementById('dataInicio').value = (c.dataInicio||'').slice(0,10);
   if (c.fotoResponsavel) { const i=document.getElementById('prevResp'); i.src=c.fotoResponsavel; i.style.display='block'; document.getElementById('phResp').style.display='none'; }
   if (c.servicos) setServicosSelected(c.servicos);
@@ -1042,7 +1044,7 @@ async function openEditar(id) {
 function closeCadastro() { document.getElementById('modalCadastro').classList.remove('open'); clienteEditId=null; }
 
 function resetForm() {
-  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio','obsCadastro'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','enderecoResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio','obsCadastro'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['prevResp','prevCrianca'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.src='';}});
   ['phResp','phCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='block';});
   ['fotoRespInput','fotoCriancaInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1093,12 +1095,14 @@ async function salvarCadastro() {
   btn.disabled=true; btn.textContent='Salvando...';
 
   const fd=new FormData();
+  const endereco = document.getElementById('enderecoResp').value.trim();
   fd.append('tipo',tipoAtual);
   fd.append('nomeResponsavel',nomeResp);
   fd.append('cpf',cpf);
   fd.append('dataNascResp',dataNascResp);
   fd.append('telefone',tel);
   fd.append('email',email);
+  if (endereco) fd.append('endereco', endereco);
   if (tipoAtual==='crianca') {
     fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca);
     const cpfC = document.getElementById('cpfCrianca').value.trim();
@@ -1201,6 +1205,7 @@ async function verDetalhe(id) {
       <div><div class="detail-label">Nascimento (Resp.)</div><div class="detail-value">${fmtData(c.dataNascResp)} · ${calcIdade(c.dataNascResp)}</div></div>
       <div><div class="detail-label">Telefone</div><div class="detail-value">${c.telefone}</div></div>
       <div><div class="detail-label">E-mail</div><div class="detail-value">${c.email}</div></div>
+      <div style="grid-column:span 2"><div class="detail-label">Endereço</div><div class="detail-value">${c.endereco||'Não informado'}</div></div>
       <div><div class="detail-label">Data de Início</div><div class="detail-value">${c.dataInicio?fmtData(c.dataInicio):'Não informado'}</div></div>
     </div>
     ${(c.servicos&&c.servicos.length)?`
