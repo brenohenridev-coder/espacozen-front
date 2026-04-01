@@ -20,6 +20,12 @@ function maskTel(el) {
   el.value = v;
 }
 
+function maskCEP(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  v = v.replace(/(\d{5})(\d)/,'$1-$2');
+  el.value = v;
+}
+
 function fmtData(iso) {
   if (!iso) return '—';
   return new Date((iso+'').slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR');
