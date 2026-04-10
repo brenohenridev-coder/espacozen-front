@@ -875,7 +875,7 @@ async function carregarPagamentos() {
   const data = await apiListarClientes(params);
   if (!data?.ok) return;
 
-  let clientes = data.clientes;
+  let clientes = data.clientes.filter(c => c.ativo);
   if (planoFiltro) clientes = clientes.filter(c => c.plano === planoFiltro);
 
   document.getElementById('p-pagos').textContent    = clientes.filter(c=>c.pago).length;
