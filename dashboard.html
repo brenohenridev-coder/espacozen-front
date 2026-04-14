@@ -893,10 +893,9 @@ async function carregarPagamentos() {
     const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
     const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
     const nomeEsc = (nome||'').replace(/'/g,"\\'");
-    const btn = c.pago
-      ? `<button class="btn btn-success btn-xs" disabled>✓ Em dia</button>
-         <button class="btn btn-ghost btn-xs" onclick="verHistorico('${c.id}','${nomeEsc}')">📋</button>`
-      : `<button class="btn btn-amarelo btn-sm" onclick="registrarPag('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`;
+    const btnPago = c.pago
+      ? `<button class="btn btn-success btn-xs" disabled>✓ Em dia</button>`
+      : `<button class="btn btn-amarelo btn-xs" onclick="registrarPag('${c.id}','${nomeEsc}')">💰 Pagar</button>`;
     return `<tr>
       <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
         <div class="name-main">${nome}</div>
@@ -907,7 +906,8 @@ async function carregarPagamentos() {
       <td>${c.plano?`<span class="badge badge-neutro">${c.plano}</span>`:'<span class="text-muted">—</span>'}</td>
       <td>${c.ultimoValor!=null?`<span style="font-weight:800;color:#16a34a">R$ ${Number(c.ultimoValor).toFixed(2)}</span>`:'<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
-      <td><div class="actions">${btn}
+      <td><div class="actions">${btnPago}
+        <button class="btn btn-ghost btn-xs" onclick="verHistorico('${c.id}','${nomeEsc}')" title="Histórico">📋</button>
         <button class="btn btn-ghost btn-xs" onclick="abrirEditarDatas('${c.id}','${c.dataPagamento?(c.dataPagamento).slice(0,10):''}','${c.proximoVencimento?(c.proximoVencimento).slice(0,10):''}','${c.ultimoValor!=null?c.ultimoValor:''}')" title="Editar datas">📅</button>
       </div></td>
     </tr>`;
