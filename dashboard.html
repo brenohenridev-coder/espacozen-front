@@ -148,7 +148,7 @@ body { display: flex; }
     <div class="mel-av">🐕<span class="mel-dot"></span></div>
     <div>
       <div class="mel-name">Mel 🐾</div>
-      <div class="mel-desc">A Mel está feliz em te ver!</div>
+      <div class="mel-desc">Mascote Golden Retriever</div>
     </div>
   </div>
 
@@ -157,23 +157,19 @@ body { display: flex; }
     <div class="nav-item active" data-view="dashboard"><span class="nav-icon">🏠</span> Painel Geral</div>
     <div class="nav-item" data-view="clientes"><span class="nav-icon">👥</span> Clientes</div>
     <div class="nav-item" data-view="pagamentos"><span class="nav-icon">💳</span> Pagamentos</div>
-    <div class="nav-item" data-view="observacoes"><span class="nav-icon">📝</span> Observações</div>
-    <div class="nav-item" data-view="atividades"><span class="nav-icon">📋</span> Atividades</div>
     <div class="nav-label">Referência</div>
+    <div class="nav-item" data-view="funcionarios"><span class="nav-icon">👨‍⚕️</span> Funcionários</div>
     <div class="nav-item" data-view="servicos"><span class="nav-icon">🩺</span> Serviços</div>
-    <div class="nav-label">Conta</div>
-    <div class="nav-item" data-view="perfil"><span class="nav-icon">⚙️</span> Meu Perfil</div>
-    <div class="nav-item hidden" data-view="usuarios" id="navUsuarios"><span class="nav-icon">🔑</span> Usuários</div>
   </nav>
 
   <div class="sidebar-footer">
-    <div class="staff-pill" style="cursor:pointer" onclick="navTo('perfil')" title="Meu Perfil">
+    <div class="staff-pill">
       <div class="staff-av" id="staffInitial">?</div>
       <div>
         <div class="staff-name" id="staffName">Carregando...</div>
         <div class="staff-role" id="staffCargo">—</div>
       </div>
-      <button class="logout-btn" onclick="event.stopPropagation();logout()" title="Sair do sistema">⏻</button>
+      <button class="logout-btn" onclick="logout()" title="Sair do sistema">⏻</button>
     </div>
   </div>
 </aside>
@@ -203,12 +199,6 @@ body { display: flex; }
       <div id="alertaDash" class="alert alert-warning hidden">
         <span style="font-size:22px">⚠️</span>
         <div><strong>Pagamentos Pendentes</strong><br><span id="alertaDashTxt"></span></div>
-      </div>
-      <div id="aniversariantesCard" class="card hidden" style="margin-bottom:24px">
-        <div class="card-header" style="background:linear-gradient(135deg,#fef9c3,#fde68a)">
-          <div><div class="card-title">🎂 Aniversariantes do Dia</div><div class="card-sub">Parabéns!</div></div>
-        </div>
-        <div id="aniversariantesLista" style="padding:16px 24px"></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -247,10 +237,10 @@ body { display: flex; }
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Atividade</th><th>Ativo</th><th>Status Pag.</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Aluno / Paciente</th><th>Tipo</th><th>Responsável</th><th>CPF</th><th>Contato</th><th>Status</th><th>Ações</th></tr></thead>
             <tbody id="clientesTable"></tbody>
           </table>
-          <div id="emptyClientes" class="empty-state hidden" style="grid-column:span 6">
+          <div id="emptyClientes" class="empty-state hidden">
             <div class="empty-icon">🔍</div><h3>Nenhum cliente encontrado</h3><p>Tente ajustar os filtros</p>
           </div>
         </div>
@@ -266,36 +256,39 @@ body { display: flex; }
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">Controle de Mensalidades</div><div class="card-sub">Renovação automática conforme plano</div></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <div class="search-wrap">
-              <input type="text" class="search-input" id="searchPag" placeholder="Pesquisar aluno..." oninput="onSearchPag()">
-            </div>
-            <select id="filterPagStatus" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
-              <option value="">Todos</option>
-              <option value="0">Somente Pendentes</option>
-              <option value="1">Somente Pagos</option>
-            </select>
-            <select id="filterPagPlano" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
-              <option value="">Todos os Planos</option>
-              <option value="Mensal">Mensal</option>
-              <option value="Trimestral">Trimestral</option>
-              <option value="Semestral">Semestral</option>
-              <option value="4 Meses">4 Meses</option>
-            </select>
-            <select id="filterPagOrdem" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
-              <option value="alfa">A → Z</option>
-              <option value="">Mais recentes</option>
-            </select>
-          </div>
+          <div><div class="card-title">Controle de Mensalidades</div><div class="card-sub">Renovação automática a cada 31 dias</div></div>
+          <select id="filterPagStatus" onchange="carregarPagamentos()" style="width:auto;padding:8px 12px;font-size:12.5px">
+            <option value="">Todos</option>
+            <option value="0">Somente Pendentes</option>
+            <option value="1">Somente Pagos</option>
+          </select>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Aluno / Paciente</th><th>Último Pagamento</th><th>Próx. Vencimento</th><th>Plano</th><th>Valor Recebido</th><th>Status</th><th>Ação</th></tr></thead>
+            <thead><tr><th>Aluno / Paciente</th><th>Último Pagamento</th><th>Próx. Vencimento</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody id="pagamentosTable"></tbody>
           </table>
           <div id="emptyPag" class="empty-state hidden">
             <div class="empty-icon">💳</div><h3>Nenhum registro</h3><p>Cadastre clientes para controlar pagamentos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FUNCIONÁRIOS ══ -->
+    <div class="view" id="view-funcionarios">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Funcionários</div><div class="card-sub" id="funcCount">Carregando...</div></div>
+          <button class="btn btn-amarelo" onclick="openNovoFuncionario()">+ Novo Funcionário</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Funcionário</th><th>Cargo</th><th>E-mail / Login</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="funcTable"></tbody>
+          </table>
+          <div id="emptyFunc" class="empty-state hidden">
+            <div class="empty-icon">👨‍⚕️</div><h3>Nenhum funcionário cadastrado</h3><p>Clique em "Novo Funcionário" para adicionar</p>
           </div>
         </div>
       </div>
@@ -308,107 +301,6 @@ body { display: flex; }
           <div><div class="card-title">Serviços Oferecidos</div><div class="card-sub">Todos os serviços disponíveis no EspaçoZen</div></div>
         </div>
         <div class="services-grid" id="servicosGrid"></div>
-      </div>
-    </div>
-
-    <!-- ══ OBSERVAÇÕES ══ -->
-    <div class="view" id="view-observacoes">
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-header">
-          <div><div class="card-title">Nova Observação</div><div class="card-sub">Escreva uma anotação para a equipe</div></div>
-        </div>
-        <div style="padding:20px 24px">
-          <textarea id="obsTexto" rows="3" placeholder="Digite sua observação aqui..." style="resize:vertical"></textarea>
-          <div style="margin-top:12px;text-align:right">
-            <button class="btn btn-primary btn-sm" onclick="salvarObservacao()">📝 Publicar</button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">Observações da Equipe</div><div class="card-sub">Anotações de todos os usuários</div></div>
-        </div>
-        <div id="obsLista" style="padding:20px 24px"></div>
-      </div>
-    </div>
-
-    <!-- ══ ATIVIDADES ══ -->
-    <div class="view" id="view-atividades">
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">Registro de Atividades</div><div class="card-sub">Todas as ações realizadas no sistema</div></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Usuário</th><th>Ação</th><th>Detalhes</th><th>Data/Hora</th></tr></thead>
-            <tbody id="logsTable"></tbody>
-          </table>
-          <div id="emptyLogs" class="empty-state hidden">
-            <div class="empty-icon">📋</div><h3>Sem registros</h3><p>Nenhuma atividade registrada ainda</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ PERFIL ══ -->
-    <div class="view" id="view-perfil">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Foto de Perfil</div><div class="card-sub">Visível para todos os usuários</div></div></div>
-          <div style="padding:28px 24px;text-align:center">
-            <div id="perfilFotoWrap" style="width:120px;height:120px;border-radius:50%;margin:0 auto 16px;overflow:hidden;border:4px solid var(--azul-suave);background:var(--azul-palido);display:flex;align-items:center;justify-content:center;font-size:48px">
-              <img id="perfilFotoImg" src="" style="width:100%;height:100%;object-fit:cover;display:none">
-              <span id="perfilFotoPlaceholder">👤</span>
-            </div>
-            <div id="perfilNomeDisplay" style="font-size:18px;font-weight:800;color:var(--azul-escuro);margin-bottom:4px"></div>
-            <div id="perfilCargoDisplay" style="font-size:13px;color:#94a3b8;font-weight:600;margin-bottom:16px"></div>
-            <label class="btn btn-ghost btn-sm" style="cursor:pointer;position:relative;overflow:hidden">
-              📷 Trocar Foto
-              <input type="file" id="perfilFotoInput" accept="image/jpeg,image/png,image/webp" onchange="uploadFotoPerfil()" style="position:absolute;inset:0;opacity:0;cursor:pointer">
-            </label>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Alterar Senha</div><div class="card-sub">Mude sua senha de acesso</div></div></div>
-          <div style="padding:24px">
-            <div class="form-group"><label>Senha Atual</label><input type="password" id="senhaAtual" placeholder="Digite sua senha atual"></div>
-            <div class="form-group"><label>Nova Senha</label><input type="password" id="novaSenha" placeholder="Mínimo 6 caracteres"></div>
-            <div class="form-group"><label>Confirmar Nova Senha</label><input type="password" id="confirmarSenha" placeholder="Repita a nova senha"></div>
-            <div id="senhaErr" class="alert alert-warning hidden" style="margin-bottom:12px"></div>
-            <button class="btn btn-primary btn-sm" onclick="alterarSenha()">🔒 Alterar Senha</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ USUÁRIOS (admin only) ══ -->
-    <div class="view" id="view-usuarios">
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-header">
-          <div><div class="card-title">Novo Usuário</div><div class="card-sub">Somente administradores</div></div>
-        </div>
-        <div style="padding:20px 24px">
-          <div class="form-grid">
-            <div class="form-group"><label>Nome</label><input type="text" id="novoFuncNome" placeholder="Nome completo"></div>
-            <div class="form-group"><label>Login (email)</label><input type="text" id="novoFuncEmail" placeholder="Login de acesso"></div>
-            <div class="form-group"><label>Senha</label><input type="password" id="novoFuncSenha" placeholder="Senha inicial"></div>
-            <div class="form-group"><label>Cargo</label><input type="text" id="novoFuncCargo" placeholder="Funcionário" value="Funcionário"></div>
-          </div>
-          <div style="text-align:right;margin-top:8px">
-            <button class="btn btn-primary btn-sm" onclick="criarFuncionario()">＋ Criar Usuário</button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">Usuários Cadastrados</div><div class="card-sub">Todos os acessos ao sistema</div></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Usuário</th><th>Login</th><th>Cargo</th><th>Desde</th></tr></thead>
-            <tbody id="funcionariosTable"></tbody>
-          </table>
-        </div>
       </div>
     </div>
 
@@ -472,8 +364,6 @@ body { display: flex; }
           <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascResp"></div>
           <div class="form-group"><label>Telefone *</label><input type="text" id="telResp" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
           <div class="form-group"><label>E-mail *</label><input type="email" id="emailResp" placeholder="email@exemplo.com"></div>
-          <div class="form-group"><label>CEP (opcional)</label><input type="text" id="cepResp" placeholder="00000-000" maxlength="9" oninput="maskCEP(this)"></div>
-          <div class="form-group col-2"><label>Endereço</label><input type="text" id="enderecoResp" placeholder="Rua, número, bairro, cidade - UF"></div>
         </div>
       </div>
 
@@ -482,32 +372,12 @@ body { display: flex; }
         <div class="form-grid">
           <div class="form-group col-2"><label>Nome Completo da Criança *</label><input type="text" id="nomeCrianca" placeholder="Nome completo da criança"></div>
           <div class="form-group"><label>Data de Nascimento *</label><input type="date" id="dataNascCrianca"></div>
-          <div class="form-group"><label>CPF da Criança (opcional)</label><input type="text" id="cpfCrianca" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
-        </div>
-        <div class="form-section-title" style="margin-top:16px">👥 2° Responsável (opcional)</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Nome do 2° Responsável</label><input type="text" id="nomeResp2" placeholder="Nome completo"></div>
-          <div class="form-group"><label>Telefone do 2° Responsável</label><input type="text" id="telResp2" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:20px">
-        <div class="form-section-title">📅 Datas</div>
-        <div class="form-grid">
-          <div class="form-group"><label>Data de Início</label><input type="date" id="dataInicio"></div>
-          <div class="form-group"><label>Último Pagamento</label><input type="date" id="cadDataPagamento"></div>
-          <div class="form-group"><label>Próximo Vencimento</label><input type="date" id="cadProxVencimento"></div>
         </div>
       </div>
 
       <div style="margin-bottom:20px">
         <div class="form-section-title">🩺 Serviços</div>
         <div id="servicosCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
-      </div>
-
-      <div style="margin-bottom:20px">
-        <div class="form-section-title">📝 Observação Inicial (opcional)</div>
-        <textarea id="obsCadastro" rows="3" placeholder="Anotação sobre o cliente (visível no perfil)..." style="resize:vertical"></textarea>
       </div>
 
       <div id="formErr" class="alert alert-warning hidden" style="margin-bottom:0"></div>
@@ -553,6 +423,100 @@ body { display: flex; }
   </div>
 </div>
 
+<!-- ════ MODAL FUNCIONÁRIO ════ -->
+<div class="modal-overlay" id="modalFuncionario">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modalFuncTitulo">Novo Funcionário</div><div class="modal-sub">Preencha os dados do funcionário</div></div>
+      <button class="modal-close" onclick="closeFuncionario()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📸 Foto do Funcionário</div>
+        <div style="display:flex;justify-content:center">
+          <div style="width:160px">
+            <div class="photo-upload-area">
+              <input type="file" id="funcFotoInput" accept="image/jpeg,image/png,image/webp" onchange="previewFoto(this,'funcPrevFoto','funcPhFoto')">
+              <img id="funcPrevFoto" class="photo-preview" style="width:90px;height:90px" alt="">
+              <div id="funcPhFoto"><div class="photo-placeholder">📷</div><div class="photo-text">Foto do funcionário</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">👤 Dados de Acesso</div>
+        <div class="form-grid">
+          <div class="form-group col-2"><label>Nome Completo *</label><input type="text" id="funcNome" placeholder="Nome completo"></div>
+          <div class="form-group"><label>E-mail / Login *</label><input type="text" id="funcEmail" placeholder="login ou email"></div>
+          <div class="form-group"><label>Senha *</label><input type="password" id="funcSenha" placeholder="Mínimo 6 caracteres"></div>
+          <div class="form-group"><label>Cargo</label>
+            <select id="funcCargo">
+              <option value="Funcionário">Funcionário</option>
+              <option value="Recepcionista">Recepcionista</option>
+              <option value="Terapeuta">Terapeuta</option>
+              <option value="Fisioterapeuta">Fisioterapeuta</option>
+              <option value="Fonoaudiólogo">Fonoaudiólogo</option>
+              <option value="Psicólogo">Psicólogo</option>
+              <option value="Nutricionista">Nutricionista</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📋 Dados Pessoais</div>
+        <div class="form-grid">
+          <div class="form-group"><label>CPF</label><input type="text" id="funcCPF" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+          <div class="form-group"><label>Faculdade / Formação</label><input type="text" id="funcFaculdade" placeholder="Ex: UNICAMP — Fisioterapia"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">🚨 Contato de Emergência</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nome</label><input type="text" id="funcEmergNome" placeholder="Nome do contato"></div>
+          <div class="form-group"><label>Telefone</label><input type="text" id="funcEmergTel" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">🏥 Saúde</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Plano de Saúde</label><input type="text" id="funcPlano" placeholder="Ex: Unimed, Não possui..."></div>
+          <div class="form-group"><label>Doenças / Alergias / Condições</label><input type="text" id="funcCondicao" placeholder="Ex: Diabetes, alergia a..."></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="form-section-title">📄 Documentos</div>
+        <div class="photo-upload-area" style="padding:16px">
+          <input type="file" id="funcDocsInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+          <div class="photo-placeholder" style="font-size:24px">📎</div>
+          <div class="photo-text">Clique para enviar documentos<br>(PDF, imagens, Word — múltiplos arquivos)</div>
+        </div>
+        <div id="funcDocsList" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+
+      <div id="funcErr" class="alert alert-warning hidden" style="margin-bottom:0"></div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeFuncionario()">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvarFunc" onclick="salvarFuncionario()">💾 Salvar Funcionário</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL DETALHE FUNCIONÁRIO ════ -->
+<div class="modal-overlay" id="modalFuncDetalhe">
+  <div class="modal" style="max-width:660px">
+    <div id="funcDetalheContent"></div>
+  </div>
+</div>
+
 <!-- ════ MODAL PAGAMENTO ════ -->
 <div class="modal-overlay" id="modalPagamento">
   <div class="modal modal-sm">
@@ -575,80 +539,10 @@ body { display: flex; }
           <span style="font-size:24px">💳</span>
           <div><div style="font-weight:800;color:var(--azul-escuro)">Cartão</div><div style="font-size:11.5px;color:#94a3b8">Débito ou crédito</div></div>
         </label>
-        <label id="optPlanoSaude" onclick="selecionarForma('Plano de Saúde')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
-          <span style="font-size:24px">🏥</span>
-          <div><div style="font-weight:800;color:var(--azul-escuro)">Plano de Saúde</div><div style="font-size:11.5px;color:#94a3b8">Convênio médico</div></div>
-        </label>
       </div>
-
-      <div class="form-section-title">📋 Plano</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-        <label id="optMensal" onclick="selecionarPlano('Mensal')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
-          <span style="font-size:20px">📅</span>
-          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Mensal</div><div style="font-size:10.5px;color:#94a3b8">31 dias</div></div>
-        </label>
-        <label id="optTrimestral" onclick="selecionarPlano('Trimestral')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
-          <span style="font-size:20px">📆</span>
-          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Trimestral</div><div style="font-size:10.5px;color:#94a3b8">93 dias</div></div>
-        </label>
-        <label id="optSemestral" onclick="selecionarPlano('Semestral')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
-          <span style="font-size:20px">🗓️</span>
-          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">Semestral</div><div style="font-size:10.5px;color:#94a3b8">186 dias</div></div>
-        </label>
-        <label id="opt4Meses" onclick="selecionarPlano('4 Meses')" class="plano-opt" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--borda);border-radius:12px;cursor:pointer;transition:all 0.15s;background:var(--cinza-suave)">
-          <span style="font-size:20px">📑</span>
-          <div><div style="font-weight:800;color:var(--azul-escuro);font-size:13px">4 Meses</div><div style="font-size:10.5px;color:#94a3b8">124 dias</div></div>
-        </label>
-      </div>
-
-      <div id="campoPlanoSaude" style="display:none;margin-bottom:16px">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro);margin-bottom:6px;display:block">🏥 Nome do Plano de Saúde</label>
-        <input type="text" id="inputNomePlanoSaude" placeholder="Ex: Unimed, Amil, SulAmérica..." style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
-      </div>
-
-      <div style="margin-bottom:16px">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro);margin-bottom:6px;display:block">💰 Valor Recebido (R$)</label>
-        <input type="number" id="inputValorRecebido" placeholder="Ex: 150.00" min="0" step="0.01" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px">Informe o valor recebido do cliente neste pagamento.</div>
-      </div>
-
-      <div style="margin-bottom:16px">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro);margin-bottom:6px;display:block">📅 Data de Vencimento (opcional)</label>
-        <input type="date" id="inputDataVencimento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border 0.15s" onfocus="this.style.borderColor='var(--azul-medio)'" onblur="this.style.borderColor='var(--borda)'">
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px">Deixe vazio para calcular automaticamente pelo plano. Use para clientes antigos com data fixa.</div>
-      </div>
-
       <div class="modal-footer" style="padding-top:0;border:none">
         <button class="btn btn-ghost" onclick="closePagamento()">Cancelar</button>
         <button class="btn btn-amarelo" id="btnConfirmarPag" disabled onclick="confirmarPagamento()">✓ Confirmar Pagamento</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════ MODAL EDITAR DATAS ════ -->
-<div class="modal-overlay" id="modalEditarDatas">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <div><div class="modal-title">Editar Datas de Pagamento</div><div class="modal-sub">Altere as datas manualmente</div></div>
-      <button class="modal-close" onclick="fecharEditarDatas()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro)">📅 Data do Pagamento</label>
-        <input type="date" id="editDataPagamento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit">
-      </div>
-      <div class="form-group" style="margin-top:12px">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro)">📅 Próximo Vencimento</label>
-        <input type="date" id="editProxVencimento" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit">
-      </div>
-      <div class="form-group" style="margin-top:12px">
-        <label style="font-size:12px;font-weight:700;color:var(--azul-escuro)">💰 Valor Recebido (R$)</label>
-        <input type="number" step="0.01" min="0" id="editValorRecebido" placeholder="Ex: 150.00" style="width:100%;padding:12px 14px;border:2px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit">
-      </div>
-      <div class="modal-footer" style="padding-top:16px;border:none">
-        <button class="btn btn-ghost" onclick="fecharEditarDatas()">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarEditarDatas()">💾 Salvar</button>
       </div>
     </div>
   </div>
@@ -667,21 +561,16 @@ const SERVICES = [
   {name:'Psicopedagoga',icon:'📚'},{name:'Psicomotricidade',icon:'🧠'},
   {name:'Psicóloga',icon:'💬'},{name:'Avaliação Neuropsicologia',icon:'🧬'},
   {name:'Terapia Alimentar',icon:'🍎'},{name:'AT - Assistente Terapêutica',icon:'🤝'},
-  {name:'TO - Terapeuta Ocupacional',icon:'🖐️'},
-  {name:'Natação Bebê',icon:'🏊'},{name:'Natação Infantil',icon:'🏊'},{name:'Natação Adulto',icon:'🏊'},
-  {name:'Natação c/ Psicomotricidade',icon:'🌊'},{name:'Natação com Personal',icon:'🏊‍♂️'},
-  {name:'Pilates',icon:'🧘'},{name:'Hidroterapia em Grupo',icon:'💧'},
+  {name:'TO - Terapeuta Ocupacional',icon:'🖐️'},{name:'Natação Bebê/Infantil/Adulto',icon:'🏊'},
+  {name:'Natação c/ Psicomotricidade',icon:'🌊'},
 ];
 
 const TOPBAR = {
-  dashboard:   ['Painel Geral','Visão geral do sistema EspaçoZen'],
-  clientes:    ['Clientes','Gerencie todos os clientes cadastrados'],
-  pagamentos:  ['Pagamentos','Controle financeiro — ciclo de 31 dias'],
-  servicos:    ['Serviços','Todos os serviços disponíveis no EspaçoZen'],
-  observacoes: ['Observações','Anotações compartilhadas da equipe'],
-  atividades:  ['Atividades','Registro de ações no sistema'],
-  perfil:      ['Meu Perfil','Configurações da sua conta'],
-  usuarios:    ['Usuários','Gerenciar acessos ao sistema'],
+  dashboard:  ['Painel Geral','Visão geral do sistema EspaçoZen'],
+  clientes:   ['Clientes','Gerencie todos os clientes cadastrados'],
+  pagamentos: ['Pagamentos','Controle financeiro — ciclo de 31 dias'],
+  funcionarios:['Funcionários','Gerencie os funcionários do EspaçoZen'],
+  servicos:   ['Serviços','Todos os serviços disponíveis no EspaçoZen'],
 };
 
 let tipoAtual='', clienteEditId=null, searchTimer=null;
@@ -713,23 +602,11 @@ function setServicosSelected(servicos) {
 document.addEventListener('DOMContentLoaded', async () => {
   if (!localStorage.getItem('ez_token')) { window.location.href='/'; return; }
 
-  // Verificar assinatura do sistema
-  try {
-    const ass = await apiStatusAssinatura();
-    if (ass.ok && !ass.ativa) mostrarBloqueio(ass.linkPagamento);
-  } catch {}
-
   const user = getUser();
   if (user) {
     document.getElementById('staffName').textContent    = user.nome;
     document.getElementById('staffCargo').textContent   = user.cargo || 'Funcionário';
     document.getElementById('staffInitial').textContent = user.nome.charAt(0).toUpperCase();
-    if (user.foto) {
-      document.getElementById('staffInitial').innerHTML = `<img src="${user.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-    }
-    if (user.cargo === 'Administrador') {
-      document.getElementById('navUsuarios').classList.remove('hidden');
-    }
   }
 
   document.querySelectorAll('.nav-item[data-view]').forEach(el =>
@@ -740,7 +617,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalClose('modalDetalhe',   closeDetalhe);
   setupModalClose('modalHistorico', closeHistorico);
   setupModalClose('modalConfirm',   closeConfirm);
-  setupModalClose('modalPagamento', closePagamento);
+  setupModalClose('modalPagamento',   closePagamento);
+  setupModalClose('modalFuncionario', closeFuncionario);
+  setupModalClose('modalFuncDetalhe', closeFuncDetalhe);
 
   renderServicos();
   renderCheckboxesServicos();
@@ -755,18 +634,14 @@ function navTo(view) {
   document.querySelector(`.nav-item[data-view="${view}"]`)?.classList.add('active');
   document.getElementById('topbarTitle').textContent = TOPBAR[view][0];
   document.getElementById('topbarSub').textContent   = TOPBAR[view][1];
-  if (view==='dashboard')   carregarDashboard();
-  if (view==='clientes')    carregarClientes();
-  if (view==='pagamentos')  carregarPagamentos();
-  if (view==='observacoes') carregarObservacoes();
-  if (view==='atividades')  carregarAtividades();
-  if (view==='perfil')      carregarPerfil();
-  if (view==='usuarios')    carregarUsuarios();
+  if (view==='dashboard')    carregarDashboard();
+  if (view==='clientes')     carregarClientes();
+  if (view==='pagamentos')   carregarPagamentos();
+  if (view==='funcionarios') carregarFuncionarios();
 }
 
 /* ── DASHBOARD ── */
 async function carregarDashboard() {
-  carregarAniversariantes();
   const data = await apiStats();
   if (!data?.ok) { toast('Erro ao carregar painel.','error'); return; }
   const {stats,recentes} = data;
@@ -826,16 +701,15 @@ async function carregarClientes(params={}) {
     const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
     const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
     const nomeEsc = (nome||'').replace(/'/g,"\\'");
-    const atividades = (c.servicos||[]).join(', ') || '—';
-    const ativoLabel = c.ativo ? '<span class="badge badge-pago">Ativo</span>' : '<span class="badge badge-pendente">Inativo</span>';
-    return `<tr style="${!c.ativo?'opacity:0.6':''}">
+    return `<tr>
       <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
         <div class="name-main">${nome}</div>
-        <div class="name-sub">${c.nomeResponsavel}${c.tipo==='crianca'?' (resp.)':''} · ${c.telefone}</div>
+        <div class="name-sub">desde ${fmtData(c.criadoEm)}</div>
       </div></div></td>
       <td><span class="badge badge-${c.tipo}">${c.tipo==='crianca'?'🧒 Criança':'🧑 Adulto'}</span></td>
-      <td style="font-size:11.5px;color:#64748b;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${atividades}">${atividades}</td>
-      <td><span style="cursor:pointer" onclick="toggleAtivo('${c.id}')" title="Clique para alternar">${ativoLabel}</span></td>
+      <td><span style="font-weight:600">${c.nomeResponsavel}</span></td>
+      <td><span style="font-size:12.5px;color:#64748b">${c.cpf}</span></td>
+      <td><span style="font-size:12.5px;font-weight:600">${c.telefone}</span></td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
       <td><div class="actions">
         <button class="btn btn-ghost btn-xs" onclick="verDetalhe('${c.id}')">👁 Ver</button>
@@ -859,43 +733,31 @@ function onSearch() {
 }
 
 /* ── PAGAMENTOS ── */
-let searchPagTimer = null;
-function onSearchPag() {
-  clearTimeout(searchPagTimer);
-  searchPagTimer = setTimeout(() => carregarPagamentos(), 350);
-}
-
 async function carregarPagamentos() {
   const pago=document.getElementById('filterPagStatus').value;
-  const q=document.getElementById('searchPag')?.value||'';
-  const ordem=document.getElementById('filterPagOrdem')?.value||'';
-  const planoFiltro=document.getElementById('filterPagPlano')?.value||'';
-  const params={}; if(pago!=='') params.pago=pago; if(q) params.q=q; if(ordem) params.ordem=ordem;
-  params.limit = 500;
+  const params={}; if(pago!=='') params.pago=pago;
   const data = await apiListarClientes(params);
   if (!data?.ok) return;
 
-  let clientes = data.clientes.filter(c => c.ativo);
-  if (planoFiltro) clientes = clientes.filter(c => c.plano === planoFiltro);
-
-  document.getElementById('p-pagos').textContent    = clientes.filter(c=>c.pago).length;
-  document.getElementById('p-pendentes').textContent= clientes.filter(c=>!c.pago).length;
-  document.getElementById('p-total').textContent    = clientes.length;
+  document.getElementById('p-pagos').textContent    = data.clientes.filter(c=>c.pago).length;
+  document.getElementById('p-pendentes').textContent= data.clientes.filter(c=>!c.pago).length;
+  document.getElementById('p-total').textContent    = data.total;
 
   const tbody=document.getElementById('pagamentosTable');
   const empty=document.getElementById('emptyPag');
 
-  if (!clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  if (!data.clientes.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
 
-  tbody.innerHTML = clientes.map(c => {
+  tbody.innerHTML = data.clientes.map(c => {
     const nome  = c.tipo==='crianca' ? c.nomeCrianca : c.nomeResponsavel;
     const foto  = c.tipo==='crianca' ? c.fotoCrianca : c.fotoResponsavel;
     const emoji = c.tipo==='crianca' ? '🧒' : '🧑';
     const nomeEsc = (nome||'').replace(/'/g,"\\'");
-    const btnPago = c.pago
-      ? `<button class="btn btn-success btn-xs" disabled>✓ Em dia</button>`
-      : `<button class="btn btn-amarelo btn-xs" onclick="registrarPag('${c.id}','${nomeEsc}')">💰 Pagar</button>`;
+    const btn = c.pago
+      ? `<button class="btn btn-success btn-xs" disabled>✓ Em dia</button>
+         <button class="btn btn-ghost btn-xs" onclick="verHistorico('${c.id}','${nomeEsc}')">📋</button>`
+      : `<button class="btn btn-amarelo btn-sm" onclick="registrarPag('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`;
     return `<tr>
       <td><div class="avatar-cell">${buildAvatar(foto,emoji)}<div>
         <div class="name-main">${nome}</div>
@@ -903,65 +765,35 @@ async function carregarPagamentos() {
       </div></div></td>
       <td>${c.dataPagamento ? fmtData(c.dataPagamento) : '<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-vence">📅 ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</span></td>
-      <td>${c.plano?`<span class="badge badge-neutro">${c.plano}</span>`:'<span class="text-muted">—</span>'}</td>
-      <td>${c.ultimoValor!=null?`<span style="font-weight:800;color:#16a34a">R$ ${Number(c.ultimoValor).toFixed(2)}</span>`:'<span class="text-muted">—</span>'}</td>
       <td><span class="badge badge-${c.pago?'pago':'pendente'}">${c.pago?'✓ Pago':'✗ Pendente'}</span></td>
-      <td><div class="actions">${btnPago}
-        <button class="btn btn-ghost btn-xs" onclick="verHistorico('${c.id}','${nomeEsc}')" title="Histórico">📋</button>
-        <button class="btn btn-ghost btn-xs" onclick="abrirEditarDatas('${c.id}','${c.dataPagamento?(c.dataPagamento).slice(0,10):''}','${c.proximoVencimento?(c.proximoVencimento).slice(0,10):''}','${c.ultimoValor!=null?c.ultimoValor:''}')" title="Editar datas">📅</button>
-      </div></td>
+      <td><div class="actions">${btn}</div></td>
     </tr>`;
   }).join('');
 }
 
-let _pagId = null, _pagNome = null, _pagForma = null, _pagPlano = null, _pagContext = null;
+let _pagId = null, _pagNome = null, _pagForma = null, _pagContext = null;
 
 function openPagamento(id, nome, context='pagamentos') {
-  _pagId = id; _pagNome = nome; _pagForma = null; _pagPlano = null; _pagContext = context;
+  _pagId = id; _pagNome = nome; _pagForma = null; _pagContext = context;
   document.getElementById('pagNomeSub').textContent = nome;
   document.getElementById('btnConfirmarPag').disabled = true;
-  ['optDinheiro','optPix','optCartao','optPlanoSaude'].forEach(id => {
+  ['optDinheiro','optPix','optCartao'].forEach(id => {
     document.getElementById(id).style.border = '2px solid var(--borda)';
     document.getElementById(id).style.background = 'var(--cinza-suave)';
   });
-  ['optMensal','optTrimestral','optSemestral','opt4Meses'].forEach(id => {
-    document.getElementById(id).style.border = '2px solid var(--borda)';
-    document.getElementById(id).style.background = 'var(--cinza-suave)';
-  });
-  document.getElementById('campoPlanoSaude').style.display = 'none';
-  document.getElementById('inputNomePlanoSaude').value = '';
-  document.getElementById('inputValorRecebido').value = '';
-  document.getElementById('inputDataVencimento').value = '';
   document.getElementById('modalPagamento').classList.add('open');
 }
 
 function selecionarForma(forma) {
   _pagForma = forma;
-  const map = { 'Dinheiro': 'optDinheiro', 'Pix': 'optPix', 'Cartão': 'optCartao', 'Plano de Saúde': 'optPlanoSaude' };
-  ['optDinheiro','optPix','optCartao','optPlanoSaude'].forEach(id => {
+  const map = { 'Dinheiro': 'optDinheiro', 'Pix': 'optPix', 'Cartão': 'optCartao' };
+  ['optDinheiro','optPix','optCartao'].forEach(id => {
     document.getElementById(id).style.border = '2px solid var(--borda)';
     document.getElementById(id).style.background = 'var(--cinza-suave)';
   });
   const el = document.getElementById(map[forma]);
   if (el) { el.style.border = '2px solid var(--azul-medio)'; el.style.background = 'var(--azul-suave)'; }
-  document.getElementById('campoPlanoSaude').style.display = forma === 'Plano de Saúde' ? 'block' : 'none';
-  checkPagBtn();
-}
-
-function selecionarPlano(plano) {
-  _pagPlano = plano;
-  const map = { 'Mensal': 'optMensal', 'Trimestral': 'optTrimestral', 'Semestral': 'optSemestral', '4 Meses': 'opt4Meses' };
-  ['optMensal','optTrimestral','optSemestral','opt4Meses'].forEach(id => {
-    document.getElementById(id).style.border = '2px solid var(--borda)';
-    document.getElementById(id).style.background = 'var(--cinza-suave)';
-  });
-  const el = document.getElementById(map[plano]);
-  if (el) { el.style.border = '2px solid var(--azul-medio)'; el.style.background = 'var(--azul-suave)'; }
-  checkPagBtn();
-}
-
-function checkPagBtn() {
-  document.getElementById('btnConfirmarPag').disabled = !(_pagForma && _pagPlano);
+  document.getElementById('btnConfirmarPag').disabled = false;
 }
 
 function closePagamento() {
@@ -970,21 +802,16 @@ function closePagamento() {
 }
 
 async function confirmarPagamento() {
-  if (!_pagId || !_pagForma || !_pagPlano) return;
-  const nomePlanoSaude = _pagForma === 'Plano de Saúde' ? (document.getElementById('inputNomePlanoSaude').value.trim() || null) : null;
-  const valorInput = document.getElementById('inputValorRecebido').value;
-  const valor = valorInput ? parseFloat(valorInput) : null;
-  const dataVencimento = document.getElementById('inputDataVencimento').value || null;
+  if (!_pagId || !_pagForma) return;
   const data = await apiFetch(`/clientes/${_pagId}/pagamento`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ formaPagamento: _pagForma, plano: _pagPlano, nomePlanoSaude, valor, dataVencimento })
+    body: JSON.stringify({ formaPagamento: _pagForma })
   });
   if (!data?.ok) { toast(data?.message||'Erro ao registrar pagamento.','error'); return; }
   closePagamento();
-  const icones = { 'Dinheiro': '💵', 'Pix': '📱', 'Cartão': '💳', 'Plano de Saúde': '🏥' };
-  const valorTxt = data.valor != null ? ` · R$${Number(data.valor).toFixed(2)}` : '';
-  toast(`Pagamento de "${_pagNome}" registrado! ${icones[_pagForma]||''} ${_pagForma} · ${_pagPlano}${valorTxt} · Próx.: ${fmtData(data.proximoVencimento)}`,'success');
+  const icones = { 'Dinheiro': '💵', 'Pix': '📱', 'Cartão': '💳' };
+  toast(`Pagamento de "${_pagNome}" registrado! ${icones[_pagForma]||''} ${_pagForma} · Próx.: ${fmtData(data.proximoVencimento)}`,'success');
   if (_pagContext === 'detalhe') { closeDetalhe(); }
   carregarDashboard();
   if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
@@ -1003,14 +830,12 @@ async function verHistorico(id, nome) {
     document.getElementById('histBody').innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon">📋</div><h3>Sem histórico</h3><p>Nenhum pagamento registrado ainda</p></div>`;
     return;
   }
-  const iconesPag = { 'Dinheiro': '💵', 'Pix': '📱', 'Cartão': '💳', 'Plano de Saúde': '🏥' };
+  const iconesPag = { 'Dinheiro': '💵', 'Pix': '📱', 'Cartão': '💳' };
   document.getElementById('histBody').innerHTML = data.historico.map(h => `
     <div class="hist-item">
       <div><div style="font-weight:700;color:var(--azul-escuro)">💰 ${fmtData(h.data_pagamento)}</div>
       <div class="text-muted">Por: ${h.funcionario_nome||'Sistema'}</div>
-      ${h.forma_pagamento ? `<span class="badge badge-neutro" style="margin-top:4px">${iconesPag[h.forma_pagamento]||'💳'} ${h.forma_pagamento}</span>` : ''}
-      ${h.plano ? `<span class="badge badge-neutro" style="margin-top:4px">📋 ${h.plano}</span>` : ''}
-      ${h.valor != null ? `<span class="badge badge-neutro" style="margin-top:4px;background:#dcfce7;color:#16a34a;font-weight:800">R$ ${Number(h.valor).toFixed(2)}</span>` : ''}</div>
+      ${h.forma_pagamento ? `<span class="badge badge-neutro" style="margin-top:4px">${iconesPag[h.forma_pagamento]||'💳'} ${h.forma_pagamento}</span>` : ''}</div>
       <div style="text-align:right"><div class="text-muted">Vencimento:</div>
       <div style="font-weight:700;color:var(--azul-medio)">${fmtData(h.vencimento)}</div></div>
     </div>`).join('');
@@ -1046,15 +871,7 @@ async function openEditar(id) {
   if (c.tipo==='crianca') {
     document.getElementById('nomeCrianca').value     = c.nomeCrianca||'';
     document.getElementById('dataNascCrianca').value = (c.dataNascCrianca||'').slice(0,10);
-    document.getElementById('cpfCrianca').value      = c.cpfCrianca||'';
-    document.getElementById('nomeResp2').value       = c.nomeResponsavel2||'';
-    document.getElementById('telResp2').value        = c.telefoneResponsavel2||'';
   }
-  document.getElementById('cepResp').value = c.cep||'';
-  document.getElementById('enderecoResp').value = c.endereco||'';
-  if (c.dataInicio) document.getElementById('dataInicio').value = (c.dataInicio||'').slice(0,10);
-  if (c.dataPagamento) document.getElementById('cadDataPagamento').value = (c.dataPagamento||'').slice(0,10);
-  if (c.proximoVencimento) document.getElementById('cadProxVencimento').value = (c.proximoVencimento||'').slice(0,10);
   if (c.fotoResponsavel) { const i=document.getElementById('prevResp'); i.src=c.fotoResponsavel; i.style.display='block'; document.getElementById('phResp').style.display='none'; }
   if (c.servicos) setServicosSelected(c.servicos);
   if (c.fotoCrianca)    { const i=document.getElementById('prevCrianca'); i.src=c.fotoCrianca; i.style.display='block'; document.getElementById('phCrianca').style.display='none'; }
@@ -1066,7 +883,7 @@ async function openEditar(id) {
 function closeCadastro() { document.getElementById('modalCadastro').classList.remove('open'); clienteEditId=null; }
 
 function resetForm() {
-  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','cepResp','enderecoResp','nomeCrianca','dataNascCrianca','cpfCrianca','nomeResp2','telResp2','dataInicio','cadDataPagamento','cadProxVencimento','obsCadastro'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nomeResp','cpfResp','dataNascResp','telResp','emailResp','nomeCrianca','dataNascCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['prevResp','prevCrianca'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.src='';}});
   ['phResp','phCrianca'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='block';});
   ['fotoRespInput','fotoCriancaInput'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1117,31 +934,13 @@ async function salvarCadastro() {
   btn.disabled=true; btn.textContent='Salvando...';
 
   const fd=new FormData();
-  const cep = document.getElementById('cepResp').value.trim();
-  const endereco = document.getElementById('enderecoResp').value.trim();
   fd.append('tipo',tipoAtual);
   fd.append('nomeResponsavel',nomeResp);
   fd.append('cpf',cpf);
   fd.append('dataNascResp',dataNascResp);
   fd.append('telefone',tel);
   fd.append('email',email);
-  if (cep) fd.append('cep', cep);
-  if (endereco) fd.append('endereco', endereco);
-  if (tipoAtual==='crianca') {
-    fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca);
-    const cpfC = document.getElementById('cpfCrianca').value.trim();
-    const nomeR2 = document.getElementById('nomeResp2').value.trim();
-    const telR2 = document.getElementById('telResp2').value.trim();
-    if (cpfC) fd.append('cpfCrianca', cpfC);
-    if (nomeR2) fd.append('nomeResponsavel2', nomeR2);
-    if (telR2) fd.append('telefoneResponsavel2', telR2);
-  }
-  const dataIni = document.getElementById('dataInicio').value;
-  if (dataIni) fd.append('dataInicio', dataIni);
-  const dataPag = document.getElementById('cadDataPagamento').value;
-  const proxVenc = document.getElementById('cadProxVencimento').value;
-  if (dataPag) fd.append('dataPagamento', dataPag);
-  if (proxVenc) fd.append('proximoVencimento', proxVenc);
+  if (tipoAtual==='crianca') { fd.append('nomeCrianca',nomeCrianca); fd.append('dataNascCrianca',dataNascCrianca); }
   const fR=document.getElementById('fotoRespInput').files[0];
   const fC=document.getElementById('fotoCriancaInput').files[0];
   if(fR) fd.append('fotoResponsavel',fR);
@@ -1154,15 +953,6 @@ async function salvarCadastro() {
       : await apiCriarCliente(fd);
 
     if (!data?.ok) { errEl.textContent=`⚠️ ${data?.message||'Erro ao salvar.'}`; errEl.classList.remove('hidden'); return; }
-
-    // Enviar observação inicial se preenchida (só no cadastro novo)
-    const obsTxt = document.getElementById('obsCadastro').value.trim();
-    if (obsTxt && !clienteEditId && data.cliente?.id) {
-      await apiFetch(`/clientes/${data.cliente.id}/observacoes`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ texto: obsTxt })
-      });
-    }
 
     closeCadastro();
     const principal = tipoAtual==='crianca' ? nomeCrianca : nomeResp;
@@ -1193,10 +983,7 @@ async function verDetalhe(id) {
       <div style="flex:1;min-width:0">
         <div class="detail-name">${nome}</div>
         <div class="detail-type">${c.tipo==='crianca'?'Paciente — Criança':'Paciente — Adulto'} · Cadastrado em ${fmtData(c.criadoEm)}</div>
-        <div style="margin-top:10px">
-        <span class="badge badge-${c.pago?'pago':'pendente'}" style="font-size:12px">${c.pago?'✓ Pagamento em dia':'✗ Pagamento pendente'}</span>
-        <span class="badge" style="font-size:12px;margin-left:6px;background:${c.ativo?'#dcfce7;color:#16a34a':'#fee2e2;color:#dc2626'}">${c.ativo?'Ativo':'Inativo'}</span>
-      </div>
+        <div style="margin-top:10px"><span class="badge badge-${c.pago?'pago':'pendente'}" style="font-size:12px">${c.pago?'✓ Pagamento em dia':'✗ Pagamento pendente'}</span></div>
       </div>
       <button class="modal-close" style="background:rgba(255,255,255,0.1);color:#fff;flex-shrink:0" onclick="closeDetalhe()">✕</button>
     </div>
@@ -1204,23 +991,18 @@ async function verDetalhe(id) {
       <div>
         <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8">Status do Pagamento</div>
         <div style="font-size:17px;font-weight:900;color:${c.pago?'#16a34a':'#dc2626'};margin-top:3px">${c.pago?'Em Dia ✓':'Pendente ✗'}</div>
-        <div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:4px">Último pag.: ${c.dataPagamento?fmtDataHora(c.dataPagamento):'Nunca'} · Próx.: ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}${c.plano?` · Plano: ${c.plano}`:''}</div>
-        ${c.nomePlanoSaude?`<div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:2px">🏥 Plano de Saúde: ${c.nomePlanoSaude}</div>`:''}
+        <div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:4px">Último pag.: ${c.dataPagamento?fmtDataHora(c.dataPagamento):'Nunca'} · Próx.: ${c.proximoVencimento?fmtData(c.proximoVencimento):'—'}</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${!c.pago?`<button class="btn btn-amarelo btn-sm" onclick="registrarPagDetalhe('${c.id}','${nomeEsc}')">💰 Marcar Pago</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();verHistorico('${c.id}','${nomeEsc}')">📋 Histórico</button>
-        <button class="btn btn-ghost btn-sm" onclick="abrirEditarDatas('${c.id}','${c.dataPagamento?c.dataPagamento.slice(0,10):''}','${c.proximoVencimento?c.proximoVencimento.slice(0,10):''}','${c.ultimoValor!=null?c.ultimoValor:''}')">📅 Editar Datas</button>
       </div>
     </div>
     <div class="detail-grid">
       ${c.tipo==='crianca'?`
         <div style="grid-column:span 2"><div class="detail-label">Nome da Criança</div><div class="detail-value">${c.nomeCrianca}</div></div>
         <div><div class="detail-label">Nascimento (Criança)</div><div class="detail-value">${fmtData(c.dataNascCrianca)} · ${calcIdade(c.dataNascCrianca)}</div></div>
-        <div><div class="detail-label">CPF da Criança</div><div class="detail-value">${c.cpfCrianca||'Não informado'}</div></div>
         <div><div class="detail-label">Foto da Criança</div><div>${c.fotoCrianca?`<img src="${c.fotoCrianca}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`:'—'}</div></div>
-        ${c.nomeResponsavel2?`<div><div class="detail-label">2° Responsável</div><div class="detail-value">${c.nomeResponsavel2}</div></div>
-        <div><div class="detail-label">Tel. 2° Responsável</div><div class="detail-value">${c.telefoneResponsavel2||'—'}</div></div>`:''}
       `:''}
       <div style="grid-column:span 2">
         <div class="detail-label">Responsável</div>
@@ -1233,43 +1015,12 @@ async function verDetalhe(id) {
       <div><div class="detail-label">Nascimento (Resp.)</div><div class="detail-value">${fmtData(c.dataNascResp)} · ${calcIdade(c.dataNascResp)}</div></div>
       <div><div class="detail-label">Telefone</div><div class="detail-value">${c.telefone}</div></div>
       <div><div class="detail-label">E-mail</div><div class="detail-value">${c.email}</div></div>
-      <div style="grid-column:span 2"><div class="detail-label">Endereço</div><div class="detail-value">${c.endereco||'Não informado'}${c.cep?` · CEP: ${c.cep}`:''}</div></div>
-      <div><div class="detail-label">Data de Início</div><div class="detail-value">${c.dataInicio?fmtData(c.dataInicio):'Não informado'}</div></div>
-    </div>
-    ${(c.servicos&&c.servicos.length)?`
-    <div style="padding:0 32px 16px">
-      <div class="detail-label" style="margin-bottom:8px">Atividades / Serviços</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${c.servicos.map(s=>`<span class="badge badge-neutro" style="font-size:11.5px">${s}</span>`).join('')}</div>
-    </div>`:''}
-    <div style="padding:0 32px 20px">
-      <div class="detail-label" style="margin-bottom:8px">Observações do Cliente</div>
-      <div id="detalheObsCliente" style="margin-bottom:10px"><div class="spinner" style="width:20px;height:20px"></div></div>
-      <div style="display:flex;gap:8px;align-items:end">
-        <textarea id="novaObsCliente" rows="2" placeholder="Escrever observação..." style="flex:1;resize:vertical;font-size:13px;padding:10px 12px;border:1.5px solid var(--borda);border-radius:8px;font-family:inherit"></textarea>
-        <button class="btn btn-primary btn-xs" onclick="salvarObsCliente('${c.id}')" style="white-space:nowrap">📝 Salvar</button>
-      </div>
-    </div>
-    <div style="padding:0 32px 20px">
-      <div class="detail-label" style="margin-bottom:8px">Documentos</div>
-      <div id="detalheDocumentos" style="margin-bottom:10px"><div class="spinner" style="width:20px;height:20px"></div></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="tipoDocUpload" style="padding:6px 10px;font-size:12px;border:1.5px solid var(--borda);border-radius:8px;font-family:inherit">
-          <option value="Atestado">Atestado</option><option value="Encaminhamento">Encaminhamento</option><option value="Laudo">Laudo</option><option value="Receita">Receita</option><option value="Outro">Outro</option>
-        </select>
-        <label class="btn btn-ghost btn-xs" style="cursor:pointer;position:relative;overflow:hidden">
-          📎 Enviar Documento
-          <input type="file" id="docUploadInput" accept="image/*,.pdf" onchange="uploadDocumento('${c.id}')" style="position:absolute;inset:0;opacity:0;cursor:pointer">
-        </label>
-      </div>
     </div>
     <div style="padding:0 32px 28px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="closeDetalhe()">Fechar</button>
       <button class="btn btn-ghost btn-sm" onclick="closeDetalhe();openEditar('${c.id}')">✏️ Editar</button>
       <button class="btn btn-danger btn-sm" onclick="closeDetalhe();confirmarDelete('${c.id}','${nomeEsc}')">🗑️ Apagar</button>
     </div>`;
-  // Carregar observações e documentos
-  carregarObsCliente(id);
-  carregarDocumentosDetalhe(id);
 }
 
 async function registrarPagDetalhe(id, nome) {
@@ -1278,336 +1029,206 @@ async function registrarPagDetalhe(id, nome) {
 
 function closeDetalhe() { document.getElementById('modalDetalhe').classList.remove('open'); }
 
-/* ── ANIVERSARIANTES ── */
-async function carregarAniversariantes() {
-  try {
-    const data = await apiAniversariantes();
-    if (!data?.ok) return;
-    const card = document.getElementById('aniversariantesCard');
-    const lista = document.getElementById('aniversariantesLista');
-    if (!data.aniversariantes.length) { card.classList.add('hidden'); return; }
-    card.classList.remove('hidden');
-    lista.innerHTML = data.aniversariantes.map(a => {
-      const isCrianca = a.tipo === 'crianca';
-      return `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--borda)">
-        <div style="font-size:32px">🎂</div>
-        <div style="flex:1">
-          <div style="font-weight:800;color:var(--azul-escuro);font-size:14px">${a.nome}</div>
-          ${isCrianca ? `<div style="font-size:12px;color:#94a3b8;font-weight:600">Filho(a) de ${a.nomeResponsavel}</div>` : ''}
-          <div style="font-size:12px;color:#64748b;font-weight:600">📞 ${a.telefone}</div>
-        </div>
-        <span class="badge ${isCrianca ? 'badge-crianca' : 'badge-adulto'}">${isCrianca ? '🧒 Criança' : '🧑 Adulto'}</span>
-      </div>`;
-    }).join('');
-  } catch {}
-}
+/* ── FUNCIONÁRIOS ── */
+let funcEditId = null;
 
-/* ── OBSERVAÇÕES ── */
-async function carregarObservacoes() {
-  const el = document.getElementById('obsLista');
-  el.innerHTML = `<div style="text-align:center;padding:24px"><div class="spinner"></div></div>`;
-  const data = await apiListarObservacoes();
-  if (!data?.ok) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><h3>Erro ao carregar</h3></div>'; return; }
-  if (!data.observacoes.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><h3>Nenhuma observação</h3><p>Publique a primeira anotação</p></div>';
-    return;
-  }
-  const user = getUser();
-  el.innerHTML = data.observacoes.map(o => {
-    const canDelete = o.funcionario_id === user?.id || user?.cargo === 'Administrador';
-    const fotoHtml = o.funcionario_foto
-      ? `<img src="${o.funcionario_foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`
-      : `<div style="width:36px;height:36px;border-radius:50%;background:var(--azul-suave);display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid var(--borda)">${(o.funcionario_nome||'?').charAt(0)}</div>`;
-    return `<div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5fb">
-      ${fotoHtml}
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <span style="font-weight:800;color:var(--azul-escuro);font-size:13.5px">${o.funcionario_nome || 'Sistema'}</span>
-          <span style="font-size:11px;color:#94a3b8">${fmtDataHora(o.criado_em)}</span>
-        </div>
-        <div style="font-size:13.5px;color:var(--cinza-texto);line-height:1.5;white-space:pre-wrap">${o.texto}</div>
-      </div>
-      ${canDelete ? `<button class="btn btn-danger btn-xs" onclick="removerObservacao(${o.id})" title="Remover" style="align-self:start">🗑</button>` : ''}
-    </div>`;
-  }).join('');
-}
-
-async function salvarObservacao() {
-  const txt = document.getElementById('obsTexto').value.trim();
-  if (!txt) { toast('Digite uma observação.','warning'); return; }
-  const data = await apiCriarObservacao(txt);
-  if (!data?.ok) { toast(data?.message||'Erro ao salvar.','error'); return; }
-  document.getElementById('obsTexto').value = '';
-  toast('Observação publicada!','success');
-  carregarObservacoes();
-}
-
-async function removerObservacao(id) {
-  confirmar('Remover Observação?', 'Esta observação será excluída permanentemente.', async () => {
-    const data = await apiRemoverObservacao(id);
-    if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
-    toast('Observação removida.','warning');
-    carregarObservacoes();
-  });
-}
-
-/* ── ATIVIDADES (LOGS) ── */
-async function carregarAtividades() {
-  const tbody = document.getElementById('logsTable');
-  const empty = document.getElementById('emptyLogs');
-  tbody.innerHTML = `<tr class="loading-row"><td colspan="4"><div class="spinner"></div></td></tr>`;
+async function carregarFuncionarios() {
+  const tbody = document.getElementById('funcTable');
+  const empty = document.getElementById('emptyFunc');
+  tbody.innerHTML = `<tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr>`;
   empty.classList.add('hidden');
-  const data = await apiListarLogs();
-  if (!data?.ok) { toast('Erro ao carregar atividades.','error'); return; }
-  if (!data.logs.length) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
 
-  const acaoLabel = {
-    'LOGIN': '🔑 Login',
-    'CRIAR_CLIENTE': '➕ Cadastrou cliente',
-    'EDITAR_CLIENTE': '✏️ Editou cliente',
-    'APAGAR_CLIENTE': '🗑️ Apagou cliente',
-    'MARCAR_PAGO': '💰 Marcou como pago',
-    'CRIAR_FUNCIONARIO': '👤 Criou usuário',
-    'ATIVAR_CLIENTE': '✅ Ativou cliente',
-    'INATIVAR_CLIENTE': '⛔ Inativou cliente',
-    'UPLOAD_DOC': '📎 Enviou documento',
-    'REMOVER_DOC': '🗑️ Removeu documento',
-    'EDITAR_DATAS_PAG': '📅 Editou datas de pagamento',
-  };
+  const data = await apiFetch('/funcionarios');
+  if (!data?.ok) { toast('Erro ao carregar funcionários.','error'); return; }
 
-  tbody.innerHTML = data.logs.map(l => {
-    const fotoHtml = l.funcionario_foto
-      ? `<img src="${l.funcionario_foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`
-      : `<div style="width:30px;height:30px;border-radius:50%;background:var(--azul-suave);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;border:2px solid var(--borda)">${(l.funcionario_nome||'?').charAt(0)}</div>`;
-    return `<tr>
-      <td><div class="avatar-cell">${fotoHtml}<span style="font-weight:700">${l.funcionario_nome || 'Sistema'}</span></div></td>
-      <td><span class="badge" style="background:var(--azul-palido);color:var(--azul-medio)">${acaoLabel[l.acao] || l.acao}</span></td>
-      <td style="font-size:12.5px;color:#64748b">${l.detalhes || '—'}</td>
-      <td style="font-size:12px;color:#94a3b8">${fmtDataHora(l.criado_em)}</td>
-    </tr>`;
-  }).join('');
-}
+  document.getElementById('funcCount').textContent = `${data.funcionarios.length} funcionário(s) cadastrado(s)`;
 
-/* ── PERFIL ── */
-async function carregarPerfil() {
-  const data = await apiMe();
-  if (!data?.ok) return;
-  const f = data.funcionario;
-  document.getElementById('perfilNomeDisplay').textContent = f.nome;
-  document.getElementById('perfilCargoDisplay').textContent = f.cargo;
-  if (f.foto) {
-    document.getElementById('perfilFotoImg').src = f.foto;
-    document.getElementById('perfilFotoImg').style.display = 'block';
-    document.getElementById('perfilFotoPlaceholder').style.display = 'none';
-  } else {
-    document.getElementById('perfilFotoImg').style.display = 'none';
-    document.getElementById('perfilFotoPlaceholder').style.display = 'block';
-  }
-}
+  if (!data.funcionarios.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
 
-async function uploadFotoPerfil() {
-  const file = document.getElementById('perfilFotoInput').files[0];
-  if (!file) return;
-  const fd = new FormData();
-  fd.append('foto', file);
-  const data = await apiUploadFoto(fd);
-  if (!data?.ok) { toast(data?.message||'Erro ao enviar foto.','error'); return; }
-  toast('Foto atualizada!','success');
-  // Atualizar localStorage e sidebar
-  const user = getUser();
-  if (user) { user.foto = data.foto; localStorage.setItem('ez_user', JSON.stringify(user)); }
-  document.getElementById('staffInitial').innerHTML = `<img src="${data.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-  carregarPerfil();
-}
-
-async function alterarSenha() {
-  const errEl = document.getElementById('senhaErr');
-  errEl.classList.add('hidden');
-  const atual = document.getElementById('senhaAtual').value;
-  const nova = document.getElementById('novaSenha').value;
-  const confirma = document.getElementById('confirmarSenha').value;
-  if (!atual || !nova || !confirma) { errEl.textContent = '⚠️ Preencha todos os campos.'; errEl.classList.remove('hidden'); return; }
-  if (nova !== confirma) { errEl.textContent = '⚠️ As senhas não coincidem.'; errEl.classList.remove('hidden'); return; }
-  if (nova.length < 6) { errEl.textContent = '⚠️ A nova senha deve ter pelo menos 6 caracteres.'; errEl.classList.remove('hidden'); return; }
-  const data = await apiAlterarSenha(atual, nova);
-  if (!data?.ok) { errEl.textContent = `⚠️ ${data?.message||'Erro ao alterar.'}`; errEl.classList.remove('hidden'); return; }
-  toast('Senha alterada com sucesso!','success');
-  document.getElementById('senhaAtual').value = '';
-  document.getElementById('novaSenha').value = '';
-  document.getElementById('confirmarSenha').value = '';
-}
-
-/* ── USUÁRIOS (admin) ── */
-async function carregarUsuarios() {
-  const data = await apiListarFuncionarios();
-  if (!data?.ok) return;
-  const tbody = document.getElementById('funcionariosTable');
   tbody.innerHTML = data.funcionarios.map(f => {
-    const fotoHtml = f.foto
-      ? `<img src="${f.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--borda)">`
-      : `<div style="width:36px;height:36px;border-radius:50%;background:var(--azul-suave);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;border:2px solid var(--borda)">${f.nome.charAt(0)}</div>`;
+    const foto = f.dados?.foto || null;
     return `<tr>
-      <td><div class="avatar-cell">${fotoHtml}<span style="font-weight:700">${f.nome}</span></div></td>
-      <td style="font-size:12.5px;color:#64748b">${f.email}</td>
-      <td><span class="badge" style="background:var(--azul-palido);color:var(--azul-medio)">${f.cargo}</span></td>
-      <td style="font-size:12px;color:#94a3b8">${fmtData(f.criado_em)}</td>
+      <td><div class="avatar-cell">
+        ${buildAvatar(foto, '👨‍⚕️')}
+        <div><div class="name-main">${f.nome}</div><div class="name-sub">${f.dados?.cpf || '—'}</div></div>
+      </div></td>
+      <td><span class="badge badge-neutro">${f.cargo}</span></td>
+      <td><span style="font-size:12.5px;color:#64748b">${f.email}</span></td>
+      <td><span class="badge badge-${f.ativo ? 'pago' : 'pendente'}">${f.ativo ? '✓ Ativo' : '✗ Inativo'}</span></td>
+      <td><div class="actions">
+        <button class="btn btn-ghost btn-xs" onclick="verFuncDetalhe('${f.id}')">👁 Ver</button>
+        <button class="btn btn-ghost btn-xs" onclick="openEditarFunc('${f.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmarDeleteFunc('${f.id}','${(f.nome||'').replace(/'/g,"\'")}')">🗑</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
 
-async function criarFuncionario() {
-  const nome = document.getElementById('novoFuncNome').value.trim();
-  const email = document.getElementById('novoFuncEmail').value.trim();
-  const senha = document.getElementById('novoFuncSenha').value;
-  const cargo = document.getElementById('novoFuncCargo').value.trim() || 'Funcionário';
-  if (!nome || !email || !senha) { toast('Preencha nome, login e senha.','warning'); return; }
-  const data = await apiCriarFuncionario({ nome, email, senha, cargo });
-  if (!data?.ok) { toast(data?.message||'Erro ao criar.','error'); return; }
-  toast(`Usuário "${nome}" criado!`,'success');
-  document.getElementById('novoFuncNome').value = '';
-  document.getElementById('novoFuncEmail').value = '';
-  document.getElementById('novoFuncSenha').value = '';
-  document.getElementById('novoFuncCargo').value = 'Funcionário';
-  carregarUsuarios();
+function openNovoFuncionario() {
+  funcEditId = null;
+  resetFormFunc();
+  document.getElementById('modalFuncTitulo').textContent = 'Novo Funcionário';
+  document.getElementById('btnSalvarFunc').textContent = '💾 Salvar Funcionário';
+  document.getElementById('funcSenha').required = true;
+  document.getElementById('modalFuncionario').classList.add('open');
 }
 
-/* ── EDITAR DATAS PAGAMENTO ── */
-let _editDatasId = null;
-
-function abrirEditarDatas(id, dataPag, proxVenc, valor) {
-  _editDatasId = id;
-  document.getElementById('editDataPagamento').value = dataPag || '';
-  document.getElementById('editProxVencimento').value = proxVenc || '';
-  document.getElementById('editValorRecebido').value = valor || '';
-  document.getElementById('modalEditarDatas').classList.add('open');
-  setupModalClose('modalEditarDatas', fecharEditarDatas);
-}
-
-function fecharEditarDatas() {
-  document.getElementById('modalEditarDatas').classList.remove('open');
-  _editDatasId = null;
-}
-
-async function salvarEditarDatas() {
-  if (!_editDatasId) return;
-  const dataPagamento = document.getElementById('editDataPagamento').value || null;
-  const proximoVencimento = document.getElementById('editProxVencimento').value || null;
-  const valorStr = document.getElementById('editValorRecebido').value;
-  const valor = valorStr ? parseFloat(valorStr) : null;
-  if (!dataPagamento && !proximoVencimento && valor === null) { toast('Preencha ao menos um campo.','warning'); return; }
-  const data = await apiFetch(`/clientes/${_editDatasId}/datas-pagamento`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dataPagamento, proximoVencimento, valor })
-  });
-  if (!data?.ok) { toast(data?.message||'Erro ao salvar datas.','error'); return; }
-  toast('Datas atualizadas!','success');
-  fecharEditarDatas();
-  closeDetalhe();
-  carregarDashboard();
-  if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
-  if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
-}
-
-/* ── OBSERVAÇÕES DO CLIENTE ── */
-async function carregarObsCliente(clienteId) {
-  const el = document.getElementById('detalheObsCliente');
-  if (!el) return;
-  const data = await apiFetch(`/clientes/${clienteId}/observacoes`);
-  if (!data?.ok || !data.observacoes.length) {
-    el.innerHTML = '<span style="font-size:12px;color:#94a3b8">Nenhuma observação.</span>';
-    return;
+async function openEditarFunc(id) {
+  const data = await apiFetch(`/funcionarios/${id}`);
+  if (!data?.ok) { toast('Erro ao carregar dados.','error'); return; }
+  const f = data.funcionario;
+  funcEditId = id;
+  resetFormFunc();
+  document.getElementById('funcNome').value     = f.nome || '';
+  document.getElementById('funcEmail').value    = f.email || '';
+  document.getElementById('funcCargo').value    = f.cargo || 'Funcionário';
+  document.getElementById('funcCPF').value      = f.dados?.cpf || '';
+  document.getElementById('funcFaculdade').value= f.dados?.faculdade || '';
+  document.getElementById('funcEmergNome').value= f.dados?.emergenciaNome || '';
+  document.getElementById('funcEmergTel').value = f.dados?.emergenciaTelefone || '';
+  document.getElementById('funcPlano').value    = f.dados?.planoSaude || '';
+  document.getElementById('funcCondicao').value = f.dados?.condicaoSaude || '';
+  if (f.dados?.foto) {
+    const img = document.getElementById('funcPrevFoto');
+    img.src = f.dados.foto; img.style.display = 'block';
+    document.getElementById('funcPhFoto').style.display = 'none';
   }
-  const user = getUser();
-  el.innerHTML = data.observacoes.map(o => {
-    const canDel = o.funcionario_id === user?.id || user?.cargo === 'Administrador';
-    return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5fb">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:var(--azul-escuro)">${o.funcionario_nome||'Sistema'}</span>
-          <span style="font-size:10.5px;color:#94a3b8">${fmtDataHora(o.criado_em)}</span>
-        </div>
-        <div style="font-size:12.5px;color:var(--cinza-texto);line-height:1.5;white-space:pre-wrap;margin-top:3px">${o.texto}</div>
-      </div>
-      ${canDel ? `<button class="btn btn-danger btn-xs" onclick="removerObsCliente('${clienteId}','${o.id}')" style="align-self:start;flex-shrink:0">🗑</button>` : ''}
-    </div>`;
-  }).join('');
-}
-
-async function salvarObsCliente(clienteId) {
-  const txt = document.getElementById('novaObsCliente').value.trim();
-  if (!txt) { toast('Digite uma observação.','warning'); return; }
-  const data = await apiFetch(`/clientes/${clienteId}/observacoes`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ texto: txt })
-  });
-  if (!data?.ok) { toast(data?.message||'Erro ao salvar.','error'); return; }
-  document.getElementById('novaObsCliente').value = '';
-  toast('Observação salva!','success');
-  carregarObsCliente(clienteId);
-}
-
-async function removerObsCliente(clienteId, obsId) {
-  confirmar('Remover Observação?', 'Esta observação será excluída.', async () => {
-    const data = await apiFetch(`/clientes/${clienteId}/observacoes/${obsId}`, { method: 'DELETE' });
-    if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
-    toast('Observação removida.','warning');
-    carregarObsCliente(clienteId);
-  });
-}
-
-/* ── DOCUMENTOS ── */
-async function carregarDocumentosDetalhe(clienteId) {
-  const el = document.getElementById('detalheDocumentos');
-  if (!el) return;
-  const data = await apiFetch(`/clientes/${clienteId}/documentos`);
-  if (!data?.ok || !data.documentos.length) {
-    el.innerHTML = '<span style="font-size:12px;color:#94a3b8">Nenhum documento enviado.</span>';
-    return;
+  // Mostrar documentos existentes
+  if (f.documentos?.length) {
+    document.getElementById('funcDocsList').innerHTML = f.documentos.map(d =>
+      `<span class="badge badge-neutro" style="gap:6px">📄 ${d.nome_arquivo}
+        <button onclick="deletarDocFunc(${d.id})" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0">✕</button>
+      </span>`
+    ).join('');
   }
-  el.innerHTML = data.documentos.map(d => `
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5fb">
-      <span style="font-size:18px">${d.tipo==='Atestado'?'📄':d.tipo==='Encaminhamento'?'📋':d.tipo==='Laudo'?'📑':d.tipo==='Receita'?'💊':'📎'}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12.5px;font-weight:700;color:var(--azul-escuro)">${d.tipo} — ${d.nome_arquivo}</div>
-        <div style="font-size:11px;color:#94a3b8">Por ${d.enviado_por_nome||'Sistema'} em ${fmtData(d.criado_em)}</div>
-      </div>
-      <a href="${d.url}" target="_blank" class="btn btn-ghost btn-xs" title="Abrir">👁</a>
-      <button class="btn btn-danger btn-xs" onclick="removerDocumento('${clienteId}','${d.id}')" title="Remover">🗑</button>
-    </div>
-  `).join('');
+  document.getElementById('modalFuncTitulo').textContent = 'Editar Funcionário';
+  document.getElementById('btnSalvarFunc').textContent = '💾 Atualizar';
+  document.getElementById('modalFuncionario').classList.add('open');
 }
 
-async function uploadDocumento(clienteId) {
-  const file = document.getElementById('docUploadInput').files[0];
-  if (!file) return;
-  const tipo = document.getElementById('tipoDocUpload').value;
+function closeFuncionario() {
+  document.getElementById('modalFuncionario').classList.remove('open');
+  funcEditId = null;
+}
+
+function resetFormFunc() {
+  ['funcNome','funcEmail','funcSenha','funcCPF','funcFaculdade','funcEmergNome','funcEmergTel','funcPlano','funcCondicao'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('funcCargo').value = 'Funcionário';
+  const img = document.getElementById('funcPrevFoto');
+  img.style.display = 'none'; img.src = '';
+  document.getElementById('funcPhFoto').style.display = 'block';
+  document.getElementById('funcDocsInput').value = '';
+  document.getElementById('funcDocsList').innerHTML = '';
+  document.getElementById('funcErr').classList.add('hidden');
+}
+
+async function salvarFuncionario() {
+  const errEl = document.getElementById('funcErr');
+  errEl.classList.add('hidden');
+
+  const nome  = document.getElementById('funcNome').value.trim();
+  const email = document.getElementById('funcEmail').value.trim();
+  const senha = document.getElementById('funcSenha').value;
+
+  if (!nome || !email) { errEl.textContent='⚠️ Nome e e-mail são obrigatórios.'; errEl.classList.remove('hidden'); return; }
+  if (!funcEditId && !senha) { errEl.textContent='⚠️ Senha é obrigatória.'; errEl.classList.remove('hidden'); return; }
+
+  const btn = document.getElementById('btnSalvarFunc');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
   const fd = new FormData();
-  fd.append('documento', file);
-  fd.append('tipoDocumento', tipo);
-  const data = await apiFetch(`/clientes/${clienteId}/documentos`, { method: 'POST', body: fd });
-  if (!data?.ok) { toast(data?.message||'Erro ao enviar documento.','error'); return; }
-  toast('Documento enviado!','success');
-  document.getElementById('docUploadInput').value = '';
-  carregarDocumentosDetalhe(clienteId);
+  fd.append('nome',          nome);
+  fd.append('email',         email);
+  fd.append('cargo',         document.getElementById('funcCargo').value);
+  fd.append('cpf',           document.getElementById('funcCPF').value);
+  fd.append('faculdade',     document.getElementById('funcFaculdade').value);
+  fd.append('emergenciaNome',document.getElementById('funcEmergNome').value);
+  fd.append('emergenciaTelefone', document.getElementById('funcEmergTel').value);
+  fd.append('planoSaude',    document.getElementById('funcPlano').value);
+  fd.append('condicaoSaude', document.getElementById('funcCondicao').value);
+  if (senha) fd.append('senha', senha);
+
+  const foto = document.getElementById('funcFotoInput').files[0];
+  if (foto) fd.append('foto', foto);
+
+  const docs = document.getElementById('funcDocsInput').files;
+  for (const doc of docs) fd.append('documentos', doc);
+
+  try {
+    const data = funcEditId
+      ? await apiFetch(`/funcionarios/${funcEditId}`, { method:'PUT', body:fd })
+      : await apiFetch('/funcionarios', { method:'POST', body:fd });
+
+    if (!data?.ok) { errEl.textContent=`⚠️ ${data?.message||'Erro ao salvar.'}`; errEl.classList.remove('hidden'); return; }
+    closeFuncionario();
+    toast(`"${nome}" ${funcEditId?'atualizado':'cadastrado'} com sucesso! 🎉`,'success');
+    carregarFuncionarios();
+  } catch { errEl.textContent='⚠️ Erro de conexão.'; errEl.classList.remove('hidden'); }
+  finally { btn.disabled=false; btn.textContent=funcEditId?'💾 Atualizar':'💾 Salvar Funcionário'; }
 }
 
-async function removerDocumento(clienteId, docId) {
-  confirmar('Remover Documento?', 'O documento será excluído permanentemente.', async () => {
-    const data = await apiFetch(`/clientes/${clienteId}/documentos/${docId}`, { method: 'DELETE' });
-    if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
-    toast('Documento removido.','warning');
-    carregarDocumentosDetalhe(clienteId);
-  });
+async function verFuncDetalhe(id) {
+  document.getElementById('funcDetalheContent').innerHTML = `<div style="padding:60px;text-align:center"><div class="spinner"></div></div>`;
+  document.getElementById('modalFuncDetalhe').classList.add('open');
+  const data = await apiFetch(`/funcionarios/${id}`);
+  if (!data?.ok) { toast('Erro ao carregar.','error'); closeFuncDetalhe(); return; }
+  const f = data.funcionario;
+  const foto = f.dados?.foto || null;
+  const avHtml = foto ? `<img src="${foto}" style="width:100%;height:100%;object-fit:cover">` : '👨‍⚕️';
+  const nomeEsc = (f.nome||'').replace(/'/g,"\'");
+
+  document.getElementById('funcDetalheContent').innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-avatar">${avHtml}</div>
+      <div style="flex:1;min-width:0">
+        <div class="detail-name">${f.nome}</div>
+        <div class="detail-type">${f.cargo} · Cadastrado em ${fmtData(f.criadoEm)}</div>
+        <div style="margin-top:8px"><span class="badge badge-${f.ativo?'pago':'pendente'}">${f.ativo?'✓ Ativo':'✗ Inativo'}</span></div>
+      </div>
+      <button class="modal-close" style="background:rgba(255,255,255,0.1);color:#fff;flex-shrink:0" onclick="closeFuncDetalhe()">✕</button>
+    </div>
+    <div class="detail-grid">
+      <div style="grid-column:span 2"><div class="detail-label">E-mail / Login</div><div class="detail-value">${f.email}</div></div>
+      ${f.dados?.cpf ? `<div><div class="detail-label">CPF</div><div class="detail-value">${f.dados.cpf}</div></div>` : ''}
+      ${f.dados?.faculdade ? `<div><div class="detail-label">Faculdade</div><div class="detail-value">${f.dados.faculdade}</div></div>` : ''}
+      ${f.dados?.emergenciaNome ? `<div><div class="detail-label">Emergência</div><div class="detail-value">${f.dados.emergenciaNome} · ${f.dados.emergenciaTelefone||'—'}</div></div>` : ''}
+      ${f.dados?.planoSaude ? `<div><div class="detail-label">Plano de Saúde</div><div class="detail-value">${f.dados.planoSaude}</div></div>` : ''}
+      ${f.dados?.condicaoSaude ? `<div style="grid-column:span 2"><div class="detail-label">Condição de Saúde</div><div class="detail-value">${f.dados.condicaoSaude}</div></div>` : ''}
+    </div>
+    ${f.documentos?.length ? `
+    <div style="padding:0 32px 20px">
+      <div class="detail-label" style="margin-bottom:10px">Documentos</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${f.documentos.map(d => `<a href="${d.url}" target="_blank" class="badge badge-neutro" style="text-decoration:none">📄 ${d.nome_arquivo}</a>`).join('')}
+      </div>
+    </div>` : ''}
+    <div style="padding:0 32px 28px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="closeFuncDetalhe()">Fechar</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeFuncDetalhe();openEditarFunc('${f.id}')">✏️ Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="closeFuncDetalhe();confirmarDeleteFunc('${f.id}','${nomeEsc}')">🗑️ Apagar</button>
+    </div>`;
 }
 
-/* ── TOGGLE ATIVO ── */
-async function toggleAtivo(id) {
-  const data = await apiFetch(`/clientes/${id}/ativo`, { method: 'PATCH' });
-  if (!data?.ok) { toast(data?.message||'Erro ao alterar status.','error'); return; }
-  toast(data.message, data.ativo ? 'success' : 'warning');
-  if (document.getElementById('view-clientes').classList.contains('active')) carregarClientes();
-  if (document.getElementById('view-pagamentos').classList.contains('active')) carregarPagamentos();
+function closeFuncDetalhe() { document.getElementById('modalFuncDetalhe').classList.remove('open'); }
+
+function confirmarDeleteFunc(id, nome) {
+  confirmar('Apagar Funcionário?',
+    `"${nome}" será removido permanentemente do sistema.`,
+    async () => {
+      const data = await apiFetch(`/funcionarios/${id}`, { method:'DELETE' });
+      if (!data?.ok) { toast(data?.message||'Erro ao remover.','error'); return; }
+      toast(`"${nome}" removido.`,'warning');
+      carregarFuncionarios();
+    }
+  );
+}
+
+async function deletarDocFunc(docId) {
+  const data = await apiFetch(`/funcionarios/documentos/${docId}`, { method:'DELETE' });
+  if (!data?.ok) { toast('Erro ao remover documento.','error'); return; }
+  toast('Documento removido.','warning');
 }
 
 /* ── DELETE ── */
