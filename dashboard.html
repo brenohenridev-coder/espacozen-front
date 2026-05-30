@@ -1520,6 +1520,23 @@ async function deletarDocFunc(docId) {
   toast('Documento removido.','warning');
 }
 
+/* BLOQUEIO DE ASSINATURA */
+function mostrarBloqueio(linkPagamento) {
+  document.body.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a2d5e,#1a4f9c);font-family:'Nunito',sans-serif">
+      <div style="background:#fff;border-radius:24px;padding:48px 52px;max-width:480px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3)">
+        <div style="font-size:64px;margin-bottom:16px">🔒</div>
+        <div style="font-size:22px;font-weight:900;color:#0a2d5e;margin-bottom:8px">Acesso Bloqueado</div>
+        <div style="font-size:14px;color:#64748b;font-weight:600;margin-bottom:32px;line-height:1.6">
+          A mensalidade do sistema está vencida.<br>Regularize o pagamento para continuar.
+        </div>
+        ${linkPagamento ? `<a href="${linkPagamento}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#f5c842,#e09000);color:#0a2d5e;font-weight:900;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none;box-shadow:0 6px 20px rgba(245,200,66,0.4)">💳 Pagar Agora</a>` : ''}
+        <div style="margin-top:20px"><button onclick="logout()" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Sair do sistema</button></div>
+      </div>
+    </div>`;
+}
+
+
 /* DELETE CLIENTE */
 function confirmarDelete(id,nome) {
   confirmar('Apagar Cliente?',`"${nome}" e todos os seus dados serão removidos permanentemente. Esta ação não pode ser desfeita.`,async()=>{
